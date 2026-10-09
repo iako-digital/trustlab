@@ -18,7 +18,7 @@ export const SEED_CLAIMS: Claim[] = [
       en: "A clip shared on social media states that a closed border crossing was reopened to cars yesterday.",
     },
     explanation: {
-      ka: "ვიდეო სამი წლის წინანდელია და სხვა გამშვები პუნქტიდანაა გადაღebული. ორივე მთავრობის ოფიციალურმა უწყებებმა დაადასტურეს, რომ პუნქტი დღემდე დახურულია.",
+      ka: "ვიდეო სამი წლის წინანდელია და სხვა გამშვები პუნქტიდანაა გადაღებული. ორივე მთავრობის ოფიციალურმა უწყებებმა დაადასტურეს, რომ პუნქტი დღემდე დახურულია.",
       hy: "Տեսանյութը երեք տարվա վաղեմության է և նկարահանված է այլ անցակետում. Երկու կառավարությունների պաշտոնական մարմինները հաստատել են, որ անցակետը մինչ օրս փակ է.",
       en: "The footage is three years old and was filmed at a different crossing. Official bodies on both sides confirmed the crossing remains closed.",
     },
@@ -48,7 +48,7 @@ export const SEED_CLAIMS: Claim[] = [
       en: "A viral post says the photo shows thousands at yesterday's rally in the capital.",
     },
     explanation: {
-      ka: "საპირისპირო ძიება აჩვენებს, რომ ფოტო 2019 წელს, სხვა ქვეყანაში გადაიღეს. მოვლენა რეალურია, მაგრამ ილუსტრაცია მცdარია — ეს მანიპულაციაა.",
+      ka: "საპირისპირო ძიება აჩვენებს, რომ ფოტო 2019 წელს, სხვა ქვეყანაში გადაიღეს. მოვლენა რეალურია, მაგრამ ილუსტრაცია მცდარია — ეს მანიპულაციაა.",
       hy: "Հակադարձ որոնումը ցույց է տալիս, որ լուսանկարը 2019-ին այլ երկրում է արվել. Իրադարձությունն իրական է, բայց նկարը սխալ է՝ դա մանիպուլյացիա է.",
       en: "A reverse image search shows the photo was taken in 2019 in another country. The event is real, but the image is misleading — this is manipulation.",
     },
@@ -66,17 +66,17 @@ export const SEED_CLAIMS: Claim[] = [
     id: "c_transit_pilot",
     title: {
       ka: "ჭორი: ქალაქი უფასო საზოგადოებრივ ტრანსპორტს ნერგავს",
-      hy: "Ասեկոսե. քաղաքը ներդնում է անվճar հասարակական տրանսպորտ",
+      hy: "Ասեկոսե. քաղաքը ներդնում է անվճար հասարակական տրանսպորտ",
       en: "Rumor: the city is rolling out free public transport",
     },
     claim: {
       ka: "მოსახლეობა აზიარებს, რომ მერიამ ერთი მარშრუტისთვის უფასო მგზავრობის საპილოტე პროგრამა გამოაცხადა.",
-      hy: "Բնակիչները տարածում են, որ քաղաքապետարանը մեկ երթուղու համար հայտարարել է անվճar երթևեկության փորձնական ծրագիր.",
+      hy: "Բնակիչները տարածում են, որ քաղաքապետարանը մեկ երթուղու համար հայտարարել է անվճար երթևեկության փորձնական ծրագիր.",
       en: "Residents are sharing that the city hall announced a free-fare pilot on one route.",
     },
     explanation: {
       ka: "ეს სიმართლეა. მერიის ოფიციალურ საიტზე გამოქვეყნდა განკარგულება ერთი მარშრუტის სამთვიანი უფასო საპილოტე პროგრამის შესახებ.",
-      hy: "Սա ճշմարիտ է. Քաղաքապետարանի պաշտոնական կայքում հրապարակվել է որոշում մեկ երթուղու եռամսյա անվճar փորձնական ծրագրի մասին.",
+      hy: "Սա ճշմարիտ է. Քաղաքապետարանի պաշտոնական կայքում հրապարակվել է որոշում մեկ երթուղու եռամսյա անվճար փորձնական ծրագրի մասին.",
       en: "This is true. The city hall's official site published an order launching a three-month free pilot on one route.",
     },
     status: "true",
@@ -101,7 +101,7 @@ export const SEED_CLAIMS: Claim[] = [
       en: "A post claims an 'archival map' proves borders from a 19th-century treaty.",
     },
     explanation: {
-      ka: "რუკა ციფრულად არის შექმნili — შრიფტი და პროექცია იმ ეპოქას არ შეესაბამება. ისტორიკოსებმა და ორმა არქივმა დაადასტურეს, რომ ორიგინალი დოკუმენტი არ არსებობს.",
+      ka: "რუკა ციფრულად არის შექმნილი — შრიფტი და პროექცია იმ ეპოქას არ შეესაბამება. ისტორიკოსებმა და ორმა არქივმა დაადასტურეს, რომ ორიგინალი დოკუმენტი არ არსებობს.",
       hy: "Քարտեզը թվային կերպով է ստեղծված՝ տառատեսակն ու պրոյեկցիան չեն համապատասխանում այդ դարաշրջանին. Պատմաբանները և երկու արխիվ հաստատել են, որ բնօրինակ փաստաթուղթ գոյություն չունի.",
       en: "The map is digitally made — the typeface and projection don't match the era. Historians and two archives confirmed no original document exists.",
     },
