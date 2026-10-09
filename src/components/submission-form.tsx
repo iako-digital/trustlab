@@ -31,27 +31,37 @@ export function SubmissionForm() {
   const [notes, setNotes] = useState("");
   const [touched, setTouched] = useState(false);
   const [done, setDone] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const [honeypot, setHoneypot] = useState("");
 
   const titleMissing = touched && !title.trim();
   const contentMissing = touched && type !== "image" && !content.trim();
   const urlMissing = touched && (type === "link" || type === "image") && !url.trim();
 
-  const submit = () => {
+  const submit = async () => {
     setTouched(true);
+    if (sending) return;
     if (!title.trim()) return;
     if (type !== "image" && !content.trim()) return;
     if ((type === "link" || type === "image") && !url.trim()) return;
 
-    addSubmission({
+    setSending(true);
+    setFailed(false);
+    const ok = await addSubmission({
       title: title.trim(),
       claim: content.trim() || title.trim(),
       category,
       sourceLang,
       submissionType: type,
-      sourceUrl: url.trim() || undefined,
+      // A hidden URL field must not leak a stale value for text submissions.
+      sourceUrl: type === "text" ? undefined : url.trim() || undefined,
       notes: notes.trim() || undefined,
+      website: honeypot,
     });
-    setDone(true);
+    setSending(false);
+    if (ok) setDone(true);
+    else setFailed(true);
   };
 
   const reset = () => {
@@ -180,7 +190,25 @@ export function SubmissionForm() {
           />
         </div>
 
-        <Button onClick={submit} variant="brand" size="lg" className="w-full">
+        {/* Honeypot: invisible to people, tempting to bots. */}
+        <input
+          type="text"
+          name="website"
+          value={honeypot}
+          onChange={(e) => setHoneypot(e.target.value)}
+          tabIndex={-1}
+          autoComplete="off"
+          aria-hidden="true"
+          className="absolute -left-[9999px] h-0 w-0 opacity-0"
+        />
+
+        {failed && (
+          <p role="alert" className="text-sm text-verdict-fake">
+            {t("submit.error")}
+          </p>
+        )}
+
+        <Button onClick={submit} disabled={sending} variant="brand" size="lg" className="w-full">
           {t("submit.send")}
         </Button>
       </div>

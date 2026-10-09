@@ -82,7 +82,7 @@ export default function ClaimDetailPage() {
         <section className="mt-8">
           <SectionLabel>{t("detail.explanation")}</SectionLabel>
           <div className="prose-editorial space-y-4 text-[17px] leading-[1.7] text-ink-soft">
-            {claim.explanation[locale]
+            {(claim.explanation[locale] || claim.explanation[claim.sourceLang] || "")
               .split("\n")
               .filter(Boolean)
               .map((para, i) => (

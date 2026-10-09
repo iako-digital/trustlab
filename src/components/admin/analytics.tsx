@@ -2,15 +2,15 @@
 
 import { CheckCircle2, Clock } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
-import { useStore } from "@/lib/store";
 import { VerdictBadge } from "@/components/verdict-badge";
-import { LOCALES, type ClaimStatus, type Locale, type Verdict } from "@/lib/types";
+import { LOCALES, type Claim, type ClaimStatus, type Locale, type Verdict } from "@/lib/types";
 
 const VERDICTS: Verdict[] = ["fake", "manipulative", "true"];
 
-export function Analytics() {
+export function Analytics({ claims: all }: { claims: Claim[] }) {
   const { t } = useI18n();
-  const { claims } = useStore();
+  // Rejected submissions are not part of the published/queue statistics.
+  const claims = all.filter((c) => c.state !== "rejected");
 
   const published = claims.filter((c) => c.status !== "pending");
   const pending = claims.filter((c) => c.status === "pending");
