@@ -1,0 +1,8 @@
+This directory holds static assets served from the site root.
+
+Expected for the quiz feature (src/components/quiz-app.tsx):
+  - quiz-photo-a.jpg  (real crowd photo)
+  - quiz-photo-b.jpg  (AI-generated portrait)
+
+If these files are absent, the quiz falls back to its icon placeholder
+automatically — no broken-image state.

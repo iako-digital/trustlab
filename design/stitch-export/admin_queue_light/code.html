@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Admin Dashboard - Queue</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary": "#004269",
+                    "surface-dim": "#dbdad6",
+                    "on-surface": "#1b1c1a",
+                    "on-secondary-fixed-variant": "#3c475b",
+                    "secondary-fixed-dim": "#bbc7df",
+                    "surface-bright": "#faf9f5",
+                    "on-tertiary-fixed-variant": "#693c00",
+                    "on-tertiary-container": "#ffbe7d",
+                    "on-secondary": "#ffffff",
+                    "primary-fixed-dim": "#95ccff",
+                    "error-container": "#ffdad6",
+                    "secondary-fixed": "#d7e3fc",
+                    "on-secondary-fixed": "#101c2e",
+                    "surface-container-low": "#f5f4f0",
+                    "outline": "#717880",
+                    "tertiary": "#5d3500",
+                    "inverse-primary": "#95ccff",
+                    "tertiary-fixed-dim": "#ffb86f",
+                    "background": "#faf9f5",
+                    "on-background": "#1b1c1a",
+                    "on-tertiary-fixed": "#2c1600",
+                    "primary-container": "#0e5a8a",
+                    "on-primary": "#ffffff",
+                    "on-secondary-container": "#576378",
+                    "on-surface-variant": "#41474f",
+                    "surface-container-high": "#e9e8e4",
+                    "tertiary-fixed": "#ffdcbd",
+                    "on-primary-container": "#a0d0ff",
+                    "inverse-surface": "#30312e",
+                    "surface-container": "#efeeea",
+                    "inverse-on-surface": "#f2f1ed",
+                    "surface-variant": "#e3e2df",
+                    "on-tertiary": "#ffffff",
+                    "tertiary-container": "#7e4900",
+                    "secondary": "#535f74",
+                    "on-error": "#ffffff",
+                    "surface-tint": "#1e6393",
+                    "error": "#ba1a1a",
+                    "on-error-container": "#93000a",
+                    "surface-container-highest": "#e3e2df",
+                    "on-primary-fixed-variant": "#004a75",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary-fixed": "#001d32",
+                    "outline-variant": "#c1c7d0",
+                    "surface": "#faf9f5",
+                    "primary-fixed": "#cde5ff",
+                    "secondary-container": "#d4e0f9"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-mobile": "16px",
+                    "gutter": "24px",
+                    "margin-desktop": "40px",
+                    "container-max": "1200px",
+                    "unit": "8px"
+            },
+            "fontFamily": {
+                    "label-caps": [
+                            "IBM Plex Mono"
+                    ],
+                    "body-md": [
+                            "Inter"
+                    ],
+                    "body-lg": [
+                            "Inter"
+                    ],
+                    "headline-md": [
+                            "Noto Serif"
+                    ],
+                    "meta-sm": [
+                            "IBM Plex Mono"
+                    ],
+                    "display-lg": [
+                            "Noto Serif"
+                    ],
+                    "headline-sm": [
+                            "Noto Serif"
+                    ]
+            },
+            "fontSize": {
+                    "label-caps": [
+                            "12px",
+                            {
+                                    "lineHeight": "1.0",
+                                    "letterSpacing": "0.1em",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "body-md": [
+                            "16px",
+                            {
+                                    "lineHeight": "1.6",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "body-lg": [
+                            "18px",
+                            {
+                                    "lineHeight": "1.6",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "headline-md": [
+                            "32px",
+                            {
+                                    "lineHeight": "1.3",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "meta-sm": [
+                            "11px",
+                            {
+                                    "lineHeight": "1.4",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "display-lg": [
+                            "48px",
+                            {
+                                    "lineHeight": "1.2",
+                                    "letterSpacing": "-0.02em",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "headline-sm": [
+                            "24px",
+                            {
+                                    "lineHeight": "1.4",
+                                    "fontWeight": "600"
+                            }
+                    ]
+            }
+          },
+        }
+      }
+    </script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=Noto+Serif:wght@600;700&amp;family=IBM+Plex+Mono:wght@400;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+          font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { background-color: #F7F6F2; } /* Paper Background */
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col">
+<!-- Top Navigation Bar -->
+<header class="bg-surface dark:bg-inverse-surface border-b border-outline-variant dark:border-outline docked full-width top-0 sticky h-[72px] flex justify-between items-center px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto w-full z-50">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim" data-icon="policy">policy</span>
+<span class="font-headline-sm text-headline-sm text-primary dark:text-primary-fixed-dim font-bold">TrustLab</span>
+</div>
+<nav class="hidden md:flex gap-8 items-center h-full">
+<a class="h-full flex items-center text-primary dark:text-primary-fixed-dim border-b-2 border-primary dark:border-primary-fixed-dim pb-1 font-label-caps text-label-caps hover:text-primary dark:hover:text-primary-fixed-dim transition-colors scale-95 active:scale-90 transition-transform" href="#">Queue</a>
+<a class="h-full flex items-center text-on-surface-variant dark:text-on-surface-variant font-label-caps text-label-caps hover:text-primary dark:hover:text-primary-fixed-dim transition-colors scale-95 active:scale-90 transition-transform" href="#">Published</a>
+<a class="h-full flex items-center text-on-surface-variant dark:text-on-surface-variant font-label-caps text-label-caps hover:text-primary dark:hover:text-primary-fixed-dim transition-colors scale-95 active:scale-90 transition-transform" href="#">Comments</a>
+<a class="h-full flex items-center text-on-surface-variant dark:text-on-surface-variant font-label-caps text-label-caps hover:text-primary dark:hover:text-primary-fixed-dim transition-colors scale-95 active:scale-90 transition-transform" href="#">Analytics</a>
+</nav>
+<div class="flex items-center gap-4">
+<div class="flex items-center bg-surface-container-low rounded-full px-3 py-1 gap-2 border border-outline-variant">
+<span class="font-label-caps text-label-caps text-primary cursor-pointer hover:opacity-80">EN</span>
+<span class="text-outline-variant">|</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant cursor-pointer hover:opacity-80">KA</span>
+<span class="text-outline-variant">|</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant cursor-pointer hover:opacity-80">HY</span>
+</div>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="language">language</span>
+</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-8 grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Sidebar / Filters -->
+<aside class="hidden lg:block lg:col-span-3">
+<div class="bg-surface-container-lowest rounded-lg p-6 shadow-[0px_2px_4px_rgba(15,27,45,0.04),0px_8px_16px_rgba(15,27,45,0.08)] sticky top-[100px]">
+<h3 class="font-headline-sm text-headline-sm mb-6 text-on-surface">Queue Filters</h3>
+<div class="space-y-6">
+<div>
+<label class="font-label-caps text-label-caps text-on-surface-variant block mb-2">Priority</label>
+<select class="w-full rounded-full border border-outline-variant bg-surface px-4 py-2 text-body-md focus:border-primary focus:ring-2 focus:ring-primary-fixed-dim outline-none transition-all">
+<option>High Priority</option>
+<option>Standard</option>
+<option>Low</option>
+</select>
+</div>
+<div>
+<label class="font-label-caps text-label-caps text-on-surface-variant block mb-2">Source Type</label>
+<div class="space-y-2">
+<label class="flex items-center gap-2 cursor-pointer">
+<input checked="" class="rounded border-outline-variant text-primary focus:ring-primary-fixed-dim" type="checkbox"/>
+<span class="text-body-md">Social Media</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer">
+<input checked="" class="rounded border-outline-variant text-primary focus:ring-primary-fixed-dim" type="checkbox"/>
+<span class="text-body-md">News Article</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer">
+<input class="rounded border-outline-variant text-primary focus:ring-primary-fixed-dim" type="checkbox"/>
+<span class="text-body-md">Direct Submission</span>
+</label>
+</div>
+</div>
+</div>
+</div>
+</aside>
+<!-- Queue Items -->
+<section class="col-span-1 lg:col-span-9 space-y-6">
+<div class="flex justify-between items-end mb-6">
+<div>
+<h1 class="font-display-lg text-display-lg text-on-surface">Verification Queue</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mt-2">12 claims pending review.</p>
+</div>
+</div>
+<!-- Evidence Card 1 -->
+<article class="bg-surface-container-lowest rounded-xl p-6 shadow-[0px_2px_4px_rgba(15,27,45,0.04),0px_8px_16px_rgba(15,27,45,0.08)] border border-outline-variant/30 relative overflow-hidden group">
+<div class="flex justify-between items-start mb-4">
+<div class="flex gap-2">
+<span class="font-label-caps text-label-caps bg-surface-container-high text-on-surface-variant px-2 py-1 rounded-sm">POLITICS</span>
+<span class="font-label-caps text-label-caps bg-error-container text-on-error-container px-2 py-1 rounded-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="close">close</span> FAKE
+                        </span>
+</div>
+<span class="font-meta-sm text-meta-sm text-on-surface-variant">ID: #49281 • Submitted 2h ago</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+<!-- EN Column -->
+<div class="space-y-2">
+<span class="font-label-caps text-label-caps text-primary border-b border-outline-variant pb-1 block">ENGLISH</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface leading-tight">Parliament passes controversial surveillance bill amidst protests.</h3>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-3">The new bill allows unprecedented access to digital communications without a warrant, sparking nationwide demonstrations.</p>
+</div>
+<!-- KA Column -->
+<div class="space-y-2">
+<span class="font-label-caps text-label-caps text-primary border-b border-outline-variant pb-1 block">GEORGIAN</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface leading-tight">პარლამენტმა საპროტესტო აქციების ფონზე სადავო კანონპროექტი მიიღო.</h3>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-3">ახალი კანონპროექტი ითვალისწინებს ციფრულ კომუნიკაციებზე უპრეცედენტო წვდომას სასამართლოს ნებართვის გარეშე.</p>
+</div>
+<!-- HY Column -->
+<div class="space-y-2">
+<span class="font-label-caps text-label-caps text-primary border-b border-outline-variant pb-1 block">ARMENIAN</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface leading-tight">Խորհրդարանն ընդունեց վիճահարույց օրինագիծը բողոքի ակցիաների ֆոնին:</h3>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-3">Նոր օրինագիծը թույլ է տալիս աննախադեպ մուտք գործել թվային հաղորդակցություններ առանց դատարանի որոշման:</p>
+</div>
+</div>
+<div class="flex justify-between items-center pt-4 border-t border-outline-variant/30">
+<div class="flex gap-4">
+<button class="flex items-center gap-2 font-label-caps text-label-caps text-primary hover:bg-primary-container/10 px-3 py-2 rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="edit">edit</span> EDIT TRANSLATIONS
+                        </button>
+<button class="flex items-center gap-2 font-label-caps text-label-caps text-on-surface-variant hover:bg-surface-variant px-3 py-2 rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="source">source</span> VIEW SOURCE
+                        </button>
+</div>
+<div class="flex gap-3">
+<button class="bg-surface-variant text-on-surface-variant font-label-caps text-label-caps px-6 py-2 rounded-full hover:bg-outline-variant transition-colors">DISMISS</button>
+<button class="bg-primary-container text-on-primary font-label-caps text-label-caps px-6 py-2 rounded-full hover:-translate-y-[2px] hover:shadow-[0_0_15px_rgba(14,90,138,0.15)] transition-all">PUBLISH</button>
+</div>
+</div>
+</article>
+<!-- Evidence Card 2 -->
+<article class="bg-surface-container-lowest rounded-xl p-6 shadow-[0px_2px_4px_rgba(15,27,45,0.04),0px_8px_16px_rgba(15,27,45,0.08)] border border-outline-variant/30 relative overflow-hidden group">
+<div class="flex justify-between items-start mb-4">
+<div class="flex gap-2">
+<span class="font-label-caps text-label-caps bg-surface-container-high text-on-surface-variant px-2 py-1 rounded-sm">ECONOMY</span>
+<span class="font-label-caps text-label-caps bg-secondary-container text-on-secondary-container px-2 py-1 rounded-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="pending">pending</span> UNVERIFIED
+                        </span>
+</div>
+<span class="font-meta-sm text-meta-sm text-on-surface-variant">ID: #49280 • Submitted 4h ago</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+<!-- EN Column -->
+<div class="space-y-2">
+<span class="font-label-caps text-label-caps text-primary border-b border-outline-variant pb-1 block">ENGLISH</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface leading-tight">Central Bank announces sudden interest rate hike.</h3>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-3">Unexpected move aimed at curbing inflation sends shockwaves through local markets.</p>
+</div>
+<!-- KA Column -->
+<div class="space-y-2 opacity-50">
+<span class="font-label-caps text-label-caps text-outline border-b border-outline-variant pb-1 block">GEORGIAN</span>
+<div class="flex items-center justify-center h-full bg-surface py-4 rounded border border-dashed border-outline-variant cursor-pointer hover:bg-surface-variant transition-colors">
+<span class="font-label-caps text-label-caps text-primary flex items-center gap-2"><span class="material-symbols-outlined" data-icon="add">add</span> ADD TRANSLATION</span>
+</div>
+</div>
+<!-- HY Column -->
+<div class="space-y-2 opacity-50">
+<span class="font-label-caps text-label-caps text-outline border-b border-outline-variant pb-1 block">ARMENIAN</span>
+<div class="flex items-center justify-center h-full bg-surface py-4 rounded border border-dashed border-outline-variant cursor-pointer hover:bg-surface-variant transition-colors">
+<span class="font-label-caps text-label-caps text-primary flex items-center gap-2"><span class="material-symbols-outlined" data-icon="add">add</span> ADD TRANSLATION</span>
+</div>
+</div>
+</div>
+<div class="flex justify-between items-center pt-4 border-t border-outline-variant/30">
+<div class="flex gap-4">
+<button class="flex items-center gap-2 font-label-caps text-label-caps text-primary hover:bg-primary-container/10 px-3 py-2 rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="edit">edit</span> EDIT TRANSLATIONS
+                        </button>
+</div>
+<div class="flex gap-3">
+<div class="relative group/picker cursor-pointer flex items-center gap-2 border border-outline-variant rounded-full px-4 py-2 hover:bg-surface-variant">
+<span class="font-label-caps text-label-caps text-on-surface-variant">SET VERDICT</span>
+<span class="material-symbols-outlined text-[16px]" data-icon="arrow_drop_down">arrow_drop_down</span>
+</div>
+<button class="bg-primary-container text-on-primary font-label-caps text-label-caps px-6 py-2 rounded-full opacity-50 cursor-not-allowed">PUBLISH</button>
+</div>
+</div>
+</article>
+</section>
+</main>
+<!-- Bottom Mobile Navigation -->
+<nav class="bg-surface dark:bg-inverse-surface border-t border-outline-variant dark:border-outline shadow-lg docked full-width bottom-0 md:hidden fixed left-0 w-full z-50 flex justify-around items-center h-16 px-4 transition-all duration-200 ease-in-out">
+<a class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary text-on-primary-container dark:text-on-primary rounded-full px-4 py-1 hover:bg-surface-container-high dark:hover:bg-surface-container-highest" href="#">
+<span class="material-symbols-outlined" data-icon="queue">queue</span>
+<span class="font-label-caps text-label-caps mt-1">Queue</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant px-4 py-1 hover:bg-surface-container-high dark:hover:bg-surface-container-highest" href="#">
+<span class="material-symbols-outlined" data-icon="published_with_changes">published_with_changes</span>
+<span class="font-label-caps text-label-caps mt-1">Published</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant px-4 py-1 hover:bg-surface-container-high dark:hover:bg-surface-container-highest" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-label-caps text-label-caps mt-1">Stats</span>
+</a>
+</nav>
+<!-- Footer -->
+<footer class="bg-surface-container-low dark:bg-surface-container-lowest border-t border-outline-variant dark:border-outline flat full-width mt-auto py-12 px-margin-mobile md:px-margin-desktop">
+<div class="max-w-container-max mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+<div class="font-headline-sm text-headline-sm text-primary dark:text-primary-fixed-dim">TrustLab</div>
+<div class="flex gap-6">
+<a class="font-body-md text-body-md font-label-caps text-label-caps text-on-surface-variant hover:underline hover:text-primary opacity-80 hover:opacity-100" href="#">Prototype</a>
+<a class="font-body-md text-body-md font-label-caps text-label-caps text-on-surface-variant hover:underline hover:text-primary opacity-80 hover:opacity-100" href="#">Georgian</a>
+<a class="font-body-md text-body-md font-label-caps text-label-caps text-on-surface-variant hover:underline hover:text-primary opacity-80 hover:opacity-100" href="#">Armenian</a>
+<a class="font-body-md text-body-md font-label-caps text-label-caps text-primary font-bold hover:underline hover:text-primary opacity-80 hover:opacity-100" href="#">English</a>
+</div>
+<div class="font-body-md text-body-md font-label-caps text-label-caps text-on-surface-variant">© 2024 TrustLab Evidence Desk</div>
+</div>
+</footer>
+</body></html>

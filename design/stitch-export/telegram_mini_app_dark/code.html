@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TrustLab Mini App</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Noto+Serif:wght@400;600;700&amp;family=IBM+Plex+Mono:wght@400;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#004269",
+                        "surface-dim": "#dbdad6",
+                        "on-surface": "#1b1c1a",
+                        "on-secondary-fixed-variant": "#3c475b",
+                        "secondary-fixed-dim": "#bbc7df",
+                        "surface-bright": "#faf9f5",
+                        "on-tertiary-fixed-variant": "#693c00",
+                        "on-tertiary-container": "#ffbe7d",
+                        "on-secondary": "#ffffff",
+                        "primary-fixed-dim": "#95ccff",
+                        "error-container": "#ffdad6",
+                        "secondary-fixed": "#d7e3fc",
+                        "on-secondary-fixed": "#101c2e",
+                        "surface-container-low": "#f5f4f0",
+                        "outline": "#717880",
+                        "tertiary": "#5d3500",
+                        "inverse-primary": "#95ccff",
+                        "tertiary-fixed-dim": "#ffb86f",
+                        "background": "#faf9f5",
+                        "on-background": "#1b1c1a",
+                        "on-tertiary-fixed": "#2c1600",
+                        "primary-container": "#0e5a8a",
+                        "on-primary": "#ffffff",
+                        "on-secondary-container": "#576378",
+                        "on-surface-variant": "#41474f",
+                        "surface-container-high": "#e9e8e4",
+                        "tertiary-fixed": "#ffdcbd",
+                        "on-primary-container": "#a0d0ff",
+                        "inverse-surface": "#30312e",
+                        "surface-container": "#efeeea",
+                        "inverse-on-surface": "#f2f1ed",
+                        "surface-variant": "#e3e2df",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-container": "#7e4900",
+                        "secondary": "#535f74",
+                        "on-error": "#ffffff",
+                        "surface-tint": "#1e6393",
+                        "error": "#ba1a1a",
+                        "on-error-container": "#93000a",
+                        "surface-container-highest": "#e3e2df",
+                        "on-primary-fixed-variant": "#004a75",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed": "#001d32",
+                        "outline-variant": "#c1c7d0",
+                        "surface": "#faf9f5",
+                        "primary-fixed": "#cde5ff",
+                        "secondary-container": "#d4e0f9"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "16px",
+                        "gutter": "24px",
+                        "margin-desktop": "40px",
+                        "container-max": "1200px",
+                        "unit": "8px"
+                    },
+                    "fontFamily": {
+                        "label-caps": ["IBM Plex Mono"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Noto Serif"],
+                        "meta-sm": ["IBM Plex Mono"],
+                        "display-lg": ["Noto Serif"],
+                        "headline-sm": ["Noto Serif"]
+                    },
+                    "fontSize": {
+                        "label-caps": ["12px", { "lineHeight": "1.0", "letterSpacing": "0.1em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-md": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "meta-sm": ["11px", { "lineHeight": "1.4", "fontWeight": "400" }],
+                        "display-lg": ["48px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-sm": ["24px", { "lineHeight": "1.4", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            /* Telegram Mini App variables typically available */
+            background-color: var(--tg-theme-bg-color, #1c1c1e);
+            color: var(--tg-theme-text-color, #ffffff);
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .loading-dots::after {
+            content: '.';
+            animation: dots 1.5s steps(5, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60% { content: '...'; }
+            80%, 100% { content: ''; }
+        }
+    </style>
+</head>
+<body class="bg-inverse-surface text-inverse-on-surface h-screen flex flex-col overflow-hidden">
+<!-- TopNav - Compact for Mini App -->
+<header class="h-[60px] flex justify-between items-center px-4 w-full z-50 border-b border-outline dark:border-outline shrink-0">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-fixed-dim" style="font-variation-settings: 'FILL' 1;">shield</span>
+<span class="font-headline-sm text-headline-sm text-primary-fixed-dim font-bold">TrustLab</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="font-label-caps text-label-caps text-primary-fixed-dim border border-primary-fixed-dim px-2 py-1 rounded">EN</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary-fixed-dim">KA</span>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 overflow-y-auto px-4 py-6 flex flex-col gap-6">
+<!-- Input Area -->
+<div class="flex flex-col gap-3">
+<label class="font-label-caps text-label-caps text-on-surface-variant" for="evidence-input">Submit Evidence</label>
+<div class="relative">
+<textarea class="w-full bg-surface-container-highest text-on-surface border border-outline-variant rounded-xl p-4 font-body-md text-body-md focus:ring-2 focus:ring-primary-fixed-dim focus:border-primary-fixed-dim transition-shadow placeholder-on-surface-variant" id="evidence-input" placeholder="Paste link or text to analyze..." readonly="" rows="4">https://t.me/suspicious_news/12345</textarea>
+<div class="absolute bottom-3 right-3 flex gap-2">
+<button class="p-2 rounded-full bg-surface-container-low hover:bg-surface-variant text-on-surface transition-colors" disabled="">
+<span class="material-symbols-outlined text-sm">link</span>
+</button>
+<button class="p-2 rounded-full bg-surface-container-low hover:bg-surface-variant text-on-surface transition-colors" disabled="">
+<span class="material-symbols-outlined text-sm">image</span>
+</button>
+</div>
+</div>
+<button class="w-full bg-primary-container text-on-primary font-label-caps text-label-caps py-3 rounded-full flex justify-center items-center gap-2 hover:bg-primary transition-colors opacity-90 cursor-not-allowed">
+<span class="material-symbols-outlined animate-spin" style="font-variation-settings: 'FILL' 1;">sync</span>
+<span>Analyzing <span class="loading-dots"></span></span>
+</button>
+</div>
+<!-- Result Card (Simulated Output) -->
+<div class="bg-[#2a2b29] border border-outline rounded-xl p-5 flex flex-col gap-4 shadow-lg opacity-80 transition-opacity">
+<div class="flex justify-between items-start">
+<div class="flex flex-col gap-1">
+<span class="font-label-caps text-label-caps text-tertiary-fixed-dim">Analysis Result</span>
+<h3 class="font-headline-md text-headline-sm text-on-secondary">High Risk Detected</h3>
+</div>
+<div class="bg-error-container/20 text-error-container border border-error-container/30 px-3 py-1 rounded-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">warning</span>
+<span class="font-label-caps text-label-caps">FAKE</span>
+</div>
+</div>
+<p class="font-body-md text-body-md text-secondary-fixed-dim border-l-2 border-outline pl-3">
+                Source exhibits strong markers of coordinated inauthentic behavior. Cross-referencing against verified regional news outlets shows significant divergence in factual claims regarding the recent border incident.
+            </p>
+<div class="flex items-center justify-between mt-2 pt-4 border-t border-outline/50">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline text-sm">database</span>
+<span class="font-meta-sm text-meta-sm text-outline">Checked against 14 sources</span>
+</div>
+<button class="text-primary-fixed-dim font-label-caps text-label-caps hover:underline flex items-center gap-1">
+                    Full Report <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</button>
+</div>
+</div>
+</main>
+<!-- Bottom Nav (Suppressed for transactional intent, but included per generic app structure if needed - hidden for focused task) -->
+<!-- Not rendering BottomNavBar to prioritize the Canvas for this specific analytical task -->
+</body></html>

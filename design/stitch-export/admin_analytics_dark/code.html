@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TrustLab Admin Dashboard - Analytics</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&amp;family=Inter:wght@400;600&amp;family=Noto+Serif:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#004269",
+                        "surface-dim": "#dbdad6",
+                        "on-surface": "#1b1c1a",
+                        "on-secondary-fixed-variant": "#3c475b",
+                        "secondary-fixed-dim": "#bbc7df",
+                        "surface-bright": "#faf9f5",
+                        "on-tertiary-fixed-variant": "#693c00",
+                        "on-tertiary-container": "#ffbe7d",
+                        "on-secondary": "#ffffff",
+                        "primary-fixed-dim": "#95ccff",
+                        "error-container": "#ffdad6",
+                        "secondary-fixed": "#d7e3fc",
+                        "on-secondary-fixed": "#101c2e",
+                        "surface-container-low": "#f5f4f0",
+                        "outline": "#717880",
+                        "tertiary": "#5d3500",
+                        "inverse-primary": "#95ccff",
+                        "tertiary-fixed-dim": "#ffb86f",
+                        "background": "#faf9f5",
+                        "on-background": "#1b1c1a",
+                        "on-tertiary-fixed": "#2c1600",
+                        "primary-container": "#0e5a8a",
+                        "on-primary": "#ffffff",
+                        "on-secondary-container": "#576378",
+                        "on-surface-variant": "#41474f",
+                        "surface-container-high": "#e9e8e4",
+                        "tertiary-fixed": "#ffdcbd",
+                        "on-primary-container": "#a0d0ff",
+                        "inverse-surface": "#30312e",
+                        "surface-container": "#efeeea",
+                        "inverse-on-surface": "#f2f1ed",
+                        "surface-variant": "#e3e2df",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-container": "#7e4900",
+                        "secondary": "#535f74",
+                        "on-error": "#ffffff",
+                        "surface-tint": "#1e6393",
+                        "error": "#ba1a1a",
+                        "on-error-container": "#93000a",
+                        "surface-container-highest": "#e3e2df",
+                        "on-primary-fixed-variant": "#004a75",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed": "#001d32",
+                        "outline-variant": "#c1c7d0",
+                        "surface": "#faf9f5",
+                        "primary-fixed": "#cde5ff",
+                        "secondary-container": "#d4e0f9"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "16px",
+                        "gutter": "24px",
+                        "margin-desktop": "40px",
+                        "container-max": "1200px",
+                        "unit": "8px"
+                    },
+                    "fontFamily": {
+                        "label-caps": ["IBM Plex Mono"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Noto Serif"],
+                        "meta-sm": ["IBM Plex Mono"],
+                        "display-lg": ["Noto Serif"],
+                        "headline-sm": ["Noto Serif"]
+                    },
+                    "fontSize": {
+                        "label-caps": ["12px", { "lineHeight": "1.0", "letterSpacing": "0.1em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-md": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "meta-sm": ["11px", { "lineHeight": "1.4", "fontWeight": "400" }],
+                        "display-lg": ["48px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-sm": ["24px", { "lineHeight": "1.4", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #0b1120; /* Deep navy background */
+            color: #f8fafc;
+        }
+        /* Overriding surface colors for this specific dark dashboard requirement */
+        .dark .dashboard-surface { background-color: #1e293b; }
+        .dark .dashboard-card { background-color: #0f172a; border-color: #334155; }
+    </style>
+</head>
+<body class="antialiased font-body-md min-h-screen flex flex-col dashboard-surface">
+<!-- TopNavBar (Simulated Dark Mode for Admin) -->
+<header class="bg-[#0f172a] text-primary-fixed-dim h-[72px] flex justify-between items-center px-margin-mobile md:px-margin-desktop w-full z-50 border-b border-[#334155] sticky top-0">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary-fixed-dim text-3xl">admin_panel_settings</span>
+<div class="font-headline-sm text-headline-sm text-primary-fixed-dim font-bold">TrustLab Admin</div>
+</div>
+<!-- Navigation Links (Hidden on mobile, showing TopAppBar version) -->
+<nav class="hidden md:flex gap-8 items-center h-full">
+<a class="h-full flex items-center text-on-surface-variant dark:text-surface-variant font-label-caps text-label-caps hover:text-primary-fixed-dim transition-colors" href="#">Queue</a>
+<a class="h-full flex items-center text-primary-fixed-dim border-b-2 border-primary-fixed-dim pb-1 font-label-caps text-label-caps" href="#">Analytics</a>
+<a class="h-full flex items-center text-on-surface-variant dark:text-surface-variant font-label-caps text-label-caps hover:text-primary-fixed-dim transition-colors" href="#">Users</a>
+</nav>
+<div class="flex items-center gap-4">
+<div class="flex gap-2 items-center bg-[#1e293b] rounded-full px-3 py-1 font-label-caps text-label-caps border border-[#334155]">
+<button class="text-primary-fixed-dim font-bold">EN</button>
+<span class="text-surface-variant">|</span>
+<button class="text-surface-variant hover:text-primary-fixed-dim transition-colors">KA</button>
+<span class="text-surface-variant">|</span>
+<button class="text-surface-variant hover:text-primary-fixed-dim transition-colors">HY</button>
+</div>
+<button class="flex items-center justify-center p-2 rounded-full hover:bg-[#1e293b] transition-colors text-primary-fixed-dim">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</header>
+<main class="flex-grow p-margin-mobile md:p-margin-desktop max-w-container-max mx-auto w-full">
+<div class="mb-gutter flex justify-between items-end">
+<div>
+<h1 class="font-display-lg text-display-lg text-white mb-2">Platform Analytics</h1>
+<p class="font-body-md text-body-md text-[#94a3b8]">System-wide metrics and verdict distribution across regions.</p>
+</div>
+<div class="flex gap-2">
+<button class="bg-[#1e293b] text-[#cbd5e1] px-4 py-2 rounded border border-[#334155] font-label-caps text-label-caps flex items-center gap-2 hover:bg-[#334155] transition-colors">
+<span class="material-symbols-outlined text-sm">calendar_month</span>
+                    Last 30 Days
+                </button>
+<button class="bg-primary-container text-on-primary px-4 py-2 rounded-full font-label-caps text-label-caps flex items-center gap-2 hover:bg-surface-tint transition-all shadow-[0_2px_4px_rgba(15,27,45,0.04)]">
+<span class="material-symbols-outlined text-sm">download</span>
+                    Export Report
+                </button>
+</div>
+</div>
+<!-- KPI Cards -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-gutter mb-gutter">
+<div class="dashboard-card p-6 rounded-lg border flex flex-col justify-between">
+<div class="font-label-caps text-label-caps text-[#94a3b8] mb-4 flex justify-between items-center">
+                    Total Submissions
+                    <span class="material-symbols-outlined text-[#64748b]">inbox</span>
+</div>
+<div class="font-display-lg text-display-lg text-white">12,408</div>
+<div class="mt-4 font-meta-sm text-meta-sm text-[#10b981] flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">arrow_upward</span>
+                    14% vs last month
+                </div>
+</div>
+<div class="dashboard-card p-6 rounded-lg border flex flex-col justify-between">
+<div class="font-label-caps text-label-caps text-[#94a3b8] mb-4 flex justify-between items-center">
+                    Verdicts Reached
+                    <span class="material-symbols-outlined text-[#64748b]">gavel</span>
+</div>
+<div class="font-display-lg text-display-lg text-white">8,932</div>
+<div class="mt-4 font-meta-sm text-meta-sm text-[#10b981] flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">arrow_upward</span>
+                    8% vs last month
+                </div>
+</div>
+<div class="dashboard-card p-6 rounded-lg border flex flex-col justify-between">
+<div class="font-label-caps text-label-caps text-[#94a3b8] mb-4 flex justify-between items-center">
+                    Pending Review
+                    <span class="material-symbols-outlined text-[#64748b]">pending_actions</span>
+</div>
+<div class="font-display-lg text-display-lg text-[#f59e0b]">3,476</div>
+<div class="mt-4 font-meta-sm text-meta-sm text-[#ef4444] flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">arrow_upward</span>
+                    22% vs last month
+                </div>
+</div>
+<div class="dashboard-card p-6 rounded-lg border flex flex-col justify-between">
+<div class="font-label-caps text-label-caps text-[#94a3b8] mb-4 flex justify-between items-center">
+                    Avg Resolution Time
+                    <span class="material-symbols-outlined text-[#64748b]">timer</span>
+</div>
+<div class="font-display-lg text-display-lg text-white">4.2d</div>
+<div class="mt-4 font-meta-sm text-meta-sm text-[#10b981] flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">arrow_downward</span>
+                    1.1d vs last month
+                </div>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<!-- Verdict Breakdown -->
+<div class="dashboard-card p-6 rounded-lg border col-span-1 md:col-span-1">
+<h2 class="font-headline-sm text-headline-sm text-white mb-6">By Verdict</h2>
+<div class="space-y-6">
+<div>
+<div class="flex justify-between font-meta-sm text-meta-sm mb-2 text-[#94a3b8]">
+<span>TRUE</span>
+<span class="text-white">2,140 (24%)</span>
+</div>
+<div class="w-full bg-[#1e293b] rounded-full h-2">
+<div class="bg-[#10b981] h-2 rounded-full" style="width: 24%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between font-meta-sm text-meta-sm mb-2 text-[#94a3b8]">
+<span>FALSE</span>
+<span class="text-white">4,820 (54%)</span>
+</div>
+<div class="w-full bg-[#1e293b] rounded-full h-2">
+<div class="bg-[#ef4444] h-2 rounded-full" style="width: 54%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between font-meta-sm text-meta-sm mb-2 text-[#94a3b8]">
+<span>MISLEADING</span>
+<span class="text-white">1,510 (17%)</span>
+</div>
+<div class="w-full bg-[#1e293b] rounded-full h-2">
+<div class="bg-[#f59e0b] h-2 rounded-full" style="width: 17%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between font-meta-sm text-meta-sm mb-2 text-[#94a3b8]">
+<span>UNVERIFIABLE</span>
+<span class="text-white">462 (5%)</span>
+</div>
+<div class="w-full bg-[#1e293b] rounded-full h-2">
+<div class="bg-[#64748b] h-2 rounded-full" style="width: 5%"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Language Breakdown -->
+<div class="dashboard-card p-6 rounded-lg border col-span-1 md:col-span-2">
+<h2 class="font-headline-sm text-headline-sm text-white mb-6">Source Language</h2>
+<div class="flex flex-col justify-center h-[calc(100%-3rem)] space-y-8">
+<div class="flex items-center gap-4">
+<div class="w-24 font-label-caps text-label-caps text-right text-[#94a3b8]">GEORGIAN</div>
+<div class="flex-grow bg-[#1e293b] rounded-sm h-8 relative">
+<div class="bg-primary-fixed-dim h-8 rounded-sm absolute left-0 top-0 flex items-center px-3" style="width: 45%">
+<span class="font-meta-sm text-meta-sm text-[#0f172a] font-bold">45%</span>
+</div>
+</div>
+<div class="w-16 font-meta-sm text-meta-sm text-right text-white">5,583</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="w-24 font-label-caps text-label-caps text-right text-[#94a3b8]">ARMENIAN</div>
+<div class="flex-grow bg-[#1e293b] rounded-sm h-8 relative">
+<div class="bg-[#cbd5e1] h-8 rounded-sm absolute left-0 top-0 flex items-center px-3" style="width: 32%">
+<span class="font-meta-sm text-meta-sm text-[#0f172a] font-bold">32%</span>
+</div>
+</div>
+<div class="w-16 font-meta-sm text-meta-sm text-right text-white">3,970</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="w-24 font-label-caps text-label-caps text-right text-[#94a3b8]">ENGLISH</div>
+<div class="flex-grow bg-[#1e293b] rounded-sm h-8 relative">
+<div class="bg-[#64748b] h-8 rounded-sm absolute left-0 top-0 flex items-center px-3" style="width: 23%">
+<span class="font-meta-sm text-meta-sm text-[#0f172a] font-bold">23%</span>
+</div>
+</div>
+<div class="w-16 font-meta-sm text-meta-sm text-right text-white">2,855</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Hidden on desktop, present for mobile structural parity) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-16 px-4 bg-[#0f172a] border-t border-[#334155] md:hidden">
+<a class="flex flex-col items-center justify-center text-[#94a3b8] px-4 py-1 transition-all duration-200 ease-in-out hover:bg-[#1e293b] rounded-lg" href="#">
+<span class="material-symbols-outlined text-[20px] mb-1">list_alt</span>
+<span class="font-label-caps text-[10px]">Queue</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary rounded-full px-4 py-1 transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined text-[20px] mb-1" style="font-variation-settings: 'FILL' 1;">analytics</span>
+<span class="font-label-caps text-[10px]">Analytics</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#94a3b8] px-4 py-1 transition-all duration-200 ease-in-out hover:bg-[#1e293b] rounded-lg" href="#">
+<span class="material-symbols-outlined text-[20px] mb-1">group</span>
+<span class="font-label-caps text-[10px]">Users</span>
+</a>
+</nav>
+</body></html>

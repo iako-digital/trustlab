@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TrustLab - Evidence Desk</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&amp;family=Inter:wght@400;500;600&amp;family=Noto+Serif:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#004269",
+                        "surface-dim": "#dbdad6",
+                        "on-surface": "#1b1c1a",
+                        "on-secondary-fixed-variant": "#3c475b",
+                        "secondary-fixed-dim": "#bbc7df",
+                        "surface-bright": "#faf9f5",
+                        "on-tertiary-fixed-variant": "#693c00",
+                        "on-tertiary-container": "#ffbe7d",
+                        "on-secondary": "#ffffff",
+                        "primary-fixed-dim": "#95ccff",
+                        "error-container": "#ffdad6",
+                        "secondary-fixed": "#d7e3fc",
+                        "on-secondary-fixed": "#101c2e",
+                        "surface-container-low": "#f5f4f0",
+                        "outline": "#717880",
+                        "tertiary": "#5d3500",
+                        "inverse-primary": "#95ccff",
+                        "tertiary-fixed-dim": "#ffb86f",
+                        "background": "#faf9f5",
+                        "on-background": "#1b1c1a",
+                        "on-tertiary-fixed": "#2c1600",
+                        "primary-container": "#0e5a8a",
+                        "on-primary": "#ffffff",
+                        "on-secondary-container": "#576378",
+                        "on-surface-variant": "#41474f",
+                        "surface-container-high": "#e9e8e4",
+                        "tertiary-fixed": "#ffdcbd",
+                        "on-primary-container": "#a0d0ff",
+                        "inverse-surface": "#30312e",
+                        "surface-container": "#efeeea",
+                        "inverse-on-surface": "#f2f1ed",
+                        "surface-variant": "#e3e2df",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-container": "#7e4900",
+                        "secondary": "#535f74",
+                        "on-error": "#ffffff",
+                        "surface-tint": "#1e6393",
+                        "error": "#ba1a1a",
+                        "on-error-container": "#93000a",
+                        "surface-container-highest": "#e3e2df",
+                        "on-primary-fixed-variant": "#004a75",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed": "#001d32",
+                        "outline-variant": "#c1c7d0",
+                        "surface": "#faf9f5",
+                        "primary-fixed": "#cde5ff",
+                        "secondary-container": "#d4e0f9"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "16px",
+                        "gutter": "24px",
+                        "margin-desktop": "40px",
+                        "container-max": "1200px",
+                        "unit": "8px"
+                    },
+                    "fontFamily": {
+                        "label-caps": ["IBM Plex Mono"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Noto Serif"],
+                        "meta-sm": ["IBM Plex Mono"],
+                        "display-lg": ["Noto Serif"],
+                        "headline-sm": ["Noto Serif"]
+                    },
+                    "fontSize": {
+                        "label-caps": ["12px", { "lineHeight": "1.0", "letterSpacing": "0.1em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-md": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "meta-sm": ["11px", { "lineHeight": "1.4", "fontWeight": "400" }],
+                        "display-lg": ["48px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-sm": ["24px", { "lineHeight": "1.4", "fontWeight": "600" }]
+                    },
+                    "boxShadow": {
+                        "evidence": "0px 2px 4px rgba(15, 27, 45, 0.04), 0px 8px 16px rgba(15, 27, 45, 0.08)"
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: #F7F6F2; } /* Paper Background */
+    </style>
+</head>
+<body class="text-on-surface antialiased flex flex-col min-h-screen relative">
+<!-- TopNavBar -->
+<header class="bg-surface dark:bg-inverse-surface border-b border-outline-variant dark:border-outline docked full-width top-0 sticky z-50">
+<div class="h-[72px] flex justify-between items-center px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto w-full">
+<div class="flex items-center gap-6">
+<a class="font-headline-sm text-headline-sm text-primary dark:text-primary-fixed-dim font-bold flex items-center gap-2" href="#">
+<span class="material-symbols-outlined" data-icon="shield">shield</span>
+                    TrustLab
+                </a>
+<nav class="hidden md:flex gap-6">
+<a class="text-primary dark:text-primary-fixed-dim border-b-2 border-primary dark:border-primary-fixed-dim pb-1 font-label-caps text-label-caps" href="#">Feed</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors font-label-caps text-label-caps" href="#">Quiz</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors font-label-caps text-label-caps" href="#">Submit</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="flex items-center gap-1 font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="language">language</span>
+                     EN
+                 </button>
+<button class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors">
+                     GE
+                 </button>
+</div>
+</div>
+</header>
+<main class="flex-grow w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-8 flex flex-col gap-12 pb-24 md:pb-8">
+<!-- Hero Section -->
+<section class="flex flex-col gap-6 items-start border-b border-outline-variant pb-8">
+<div class="flex gap-2 flex-wrap">
+<span class="bg-error/10 text-error font-label-caps text-label-caps px-3 py-1 rounded-sm flex items-center gap-1 border border-error/20"><span class="material-symbols-outlined text-[14px]">close</span> ყალბი (Fake)</span>
+<span class="bg-tertiary-container/10 text-tertiary-container font-label-caps text-label-caps px-3 py-1 rounded-sm flex items-center gap-1 border border-tertiary-container/20"><span class="material-symbols-outlined text-[14px]">warning</span> შეცდომაში შემყვანი (Misleading)</span>
+<span class="bg-primary/10 text-primary font-label-caps text-label-caps px-3 py-1 rounded-sm flex items-center gap-1 border border-primary/20"><span class="material-symbols-outlined text-[14px]">check</span> სიმართლე (True)</span>
+</div>
+<h1 class="font-display-lg text-display-lg text-on-surface max-w-3xl">Evidence Desk: Regional Information Integrity</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">Investigating claims and verifying facts across the Caucasus region with rigorous OSINT methodologies.</p>
+</section>
+<!-- Promo Banner -->
+<section class="bg-inverse-surface rounded-xl p-8 flex flex-col md:flex-row justify-between items-center gap-6 shadow-evidence relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-r from-primary/20 to-transparent pointer-events-none"></div>
+<div class="relative z-10 flex flex-col gap-2">
+<h2 class="font-headline-sm text-headline-sm text-surface-container-lowest">Test Your Media Literacy</h2>
+<p class="font-body-md text-body-md text-surface-variant">Take our interactive quiz to identify common disinformation tactics.</p>
+</div>
+<button class="relative z-10 bg-primary-container text-on-primary font-label-caps text-label-caps px-6 py-3 rounded-full hover:bg-primary transition-all duration-200 hover:-translate-y-0.5 shadow-md flex items-center gap-2 group">
+                 TAKE THE QUIZ
+                 <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</section>
+<!-- Filter Toolbar -->
+<section class="bg-surface-container-lowest rounded-lg p-4 shadow-evidence flex flex-col md:flex-row gap-4 justify-between items-center border border-outline-variant/30">
+<div class="flex gap-4 w-full md:w-auto">
+<div class="relative flex-grow md:flex-grow-0">
+<select class="w-full md:w-48 appearance-none bg-transparent border border-outline-variant text-on-surface font-body-md text-body-md rounded-full px-4 py-2 pr-10 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+<option>All Topics</option>
+<option>Politics</option>
+<option>Economy</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline pointer-events-none">expand_more</span>
+</div>
+<div class="relative flex-grow md:flex-grow-0">
+<select class="w-full md:w-48 appearance-none bg-transparent border border-outline-variant text-on-surface font-body-md text-body-md rounded-full px-4 py-2 pr-10 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+<option>Region</option>
+<option>Georgia</option>
+<option>Armenia</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline pointer-events-none">expand_more</span>
+</div>
+</div>
+<div class="relative w-full md:w-64">
+<input class="w-full bg-transparent border border-outline-variant text-on-surface font-body-md text-body-md rounded-full px-4 py-2 pl-10 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary placeholder:text-outline" placeholder="Search claims..." type="text"/>
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+</div>
+</section>
+<!-- Claim Cards Grid -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- Card 1 (Fake) -->
+<article class="bg-surface-container-lowest rounded-xl p-6 shadow-evidence flex flex-col gap-4 border border-outline-variant/20 hover:shadow-lg transition-shadow">
+<div class="flex justify-between items-start">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Politics</span>
+<span class="bg-error/10 text-error font-label-caps text-label-caps px-2 py-1 rounded-sm flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">close</span> ყალბი</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface line-clamp-3">Deepfake video circulates claiming prominent official admitted to corruption charges during closed-door meeting.</h3>
+<div class="mt-auto pt-4 border-t border-outline-variant/30 flex justify-between items-center text-on-surface-variant font-meta-sm text-meta-sm">
+<span>Oct 24, 2024</span>
+<a class="hover:text-primary flex items-center gap-1" href="#">Read Evidence <span class="material-symbols-outlined text-[14px]">arrow_forward</span></a>
+</div>
+</article>
+<!-- Card 2 (Misleading) -->
+<article class="bg-surface-container-lowest rounded-xl p-6 shadow-evidence flex flex-col gap-4 border border-outline-variant/20 hover:shadow-lg transition-shadow">
+<div class="flex justify-between items-start">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Economy</span>
+<span class="bg-tertiary-container/10 text-tertiary-container font-label-caps text-label-caps px-2 py-1 rounded-sm flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">warning</span> შეცდომაში შემყვანი</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface line-clamp-3">Recent economic report data manipulated to show a 50% drop in regional investments compared to last year.</h3>
+<div class="relative w-full h-32 rounded-lg overflow-hidden my-2 border border-outline-variant/20">
+<div class="absolute inset-0 bg-black/60 backdrop-blur-md z-10 flex flex-col items-center justify-center gap-2 group cursor-pointer hover:bg-black/70 transition-colors">
+<span class="material-symbols-outlined text-surface-container-lowest">lock</span>
+<span class="font-label-caps text-label-caps text-surface-container-lowest">SENSITIVE CONTENT - CLICK TO VIEW</span>
+</div>
+<img class="w-full h-full object-cover" data-alt="A blurred chart showing a steep decline in a graph, styled in a muted, authoritative editorial aesthetic with a pale background and dark blue data lines. The lighting is flat and analytical." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDkOn2K9kH15BPo1TL1fpZQaNvsWxjXp6N6juoi5RBRfgwea1cSCHY5LYUNmsy0SPTSNaU12mrR4Gx0a7Ehac1tE7jdMMHhbshfiMD21pbMnd7HTjgO8q18is6GJgDPgRmkeE8NvWP7G32vrcIkpLTf-NdTaVSkTu35ZJDfA5VNVbasgAkkHGhOYOgKZf-h14ERtYYcRNs5HCvuZb78C1cc4K4g3lKs2BCVNX_BvF7PZCF21WS797mvlA"/>
+</div>
+<div class="mt-auto pt-4 border-t border-outline-variant/30 flex justify-between items-center text-on-surface-variant font-meta-sm text-meta-sm">
+<span>Oct 22, 2024</span>
+<a class="hover:text-primary flex items-center gap-1" href="#">Read Evidence <span class="material-symbols-outlined text-[14px]">arrow_forward</span></a>
+</div>
+</article>
+<!-- Card 3 (True) -->
+<article class="bg-surface-container-lowest rounded-xl p-6 shadow-evidence flex flex-col gap-4 border border-outline-variant/20 hover:shadow-lg transition-shadow">
+<div class="flex justify-between items-start">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Health</span>
+<span class="bg-primary/10 text-primary font-label-caps text-label-caps px-2 py-1 rounded-sm flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">check</span> სიმართლე</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface line-clamp-3">New water purification facility officially opens in the northern district, resolving long-standing contamination issues.</h3>
+<div class="mt-auto pt-4 border-t border-outline-variant/30 flex justify-between items-center text-on-surface-variant font-meta-sm text-meta-sm">
+<span>Oct 20, 2024</span>
+<a class="hover:text-primary flex items-center gap-1" href="#">Read Evidence <span class="material-symbols-outlined text-[14px]">arrow_forward</span></a>
+</div>
+</article>
+</section>
+<!-- Tools & Extensions Grid -->
+<section class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+<div class="bg-surface-container-low rounded-xl p-8 border border-outline-variant flex flex-col gap-4">
+<div class="flex items-center gap-3 text-primary mb-2">
+<span class="material-symbols-outlined text-3xl" data-icon="extension">extension</span>
+<h3 class="font-headline-sm text-headline-sm">Browser Extension</h3>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant flex-grow">Automatically verify claims as you browse social media and news sites with our real-time fact-checking overlay.</p>
+<button class="bg-surface-container-lowest border border-outline text-on-surface font-label-caps text-label-caps px-6 py-2 rounded-full hover:bg-surface-variant transition-colors self-start mt-2">INSTALL EXTENSION</button>
+</div>
+<div class="bg-surface-container-low rounded-xl p-8 border border-outline-variant flex flex-col gap-4">
+<div class="flex items-center gap-3 text-primary mb-2">
+<span class="material-symbols-outlined text-3xl" data-icon="smart_toy">smart_toy</span>
+<h3 class="font-headline-sm text-headline-sm">Fact-Check Bot</h3>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant flex-grow">Send suspicious links or messages directly to our Telegram bot for an automated initial analysis and expert review queue.</p>
+<button class="bg-surface-container-lowest border border-outline text-on-surface font-label-caps text-label-caps px-6 py-2 rounded-full hover:bg-surface-variant transition-colors self-start mt-2">ADD TO TELEGRAM</button>
+</div>
+</section>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-16 px-4 bg-surface dark:bg-inverse-surface border-t border-outline-variant dark:border-outline shadow-lg md:hidden">
+<a class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary text-on-primary-container dark:text-on-primary rounded-full px-4 py-1 transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="rss_feed">rss_feed</span>
+<span class="font-label-caps text-label-caps mt-1">Feed</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant px-4 py-1 hover:bg-surface-container-high dark:hover:bg-surface-container-highest rounded-full transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="quiz">quiz</span>
+<span class="font-label-caps text-label-caps mt-1">Quiz</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant px-4 py-1 hover:bg-surface-container-high dark:hover:bg-surface-container-highest rounded-full transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="publish">publish</span>
+<span class="font-label-caps text-label-caps mt-1">Submit</span>
+</a>
+</nav>
+<!-- Footer -->
+<footer class="bg-surface-container-low dark:bg-surface-container-lowest border-t border-outline-variant dark:border-outline full-width mt-auto">
+<div class="py-12 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+<span class="font-body-md text-body-md text-on-surface dark:text-on-surface">© 2024 TrustLab Evidence Desk</span>
+<div class="flex gap-4 flex-wrap justify-center">
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:underline hover:text-primary opacity-80 hover:opacity-100 transition-opacity" href="#">Prototype</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:underline hover:text-primary opacity-80 hover:opacity-100 transition-opacity" href="#">Georgian</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:underline hover:text-primary opacity-80 hover:opacity-100 transition-opacity" href="#">Armenian</a>
+<a class="font-label-caps text-label-caps text-primary font-bold hover:underline hover:text-primary opacity-80 hover:opacity-100 transition-opacity" href="#">English</a>
+</div>
+</div>
+</footer>
+</body></html>

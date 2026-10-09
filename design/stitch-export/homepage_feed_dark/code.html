@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TrustLab - Evidence Desk</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&amp;family=Inter:wght@400;500;600&amp;family=Noto+Serif:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#004269",
+                        "surface-dim": "#dbdad6",
+                        "on-surface": "#1b1c1a",
+                        "on-secondary-fixed-variant": "#3c475b",
+                        "secondary-fixed-dim": "#bbc7df",
+                        "surface-bright": "#faf9f5",
+                        "on-tertiary-fixed-variant": "#693c00",
+                        "on-tertiary-container": "#ffbe7d",
+                        "on-secondary": "#ffffff",
+                        "primary-fixed-dim": "#95ccff",
+                        "error-container": "#ffdad6",
+                        "secondary-fixed": "#d7e3fc",
+                        "on-secondary-fixed": "#101c2e",
+                        "surface-container-low": "#f5f4f0",
+                        "outline": "#717880",
+                        "tertiary": "#5d3500",
+                        "inverse-primary": "#95ccff",
+                        "tertiary-fixed-dim": "#ffb86f",
+                        "background": "#faf9f5",
+                        "on-background": "#1b1c1a",
+                        "on-tertiary-fixed": "#2c1600",
+                        "primary-container": "#0e5a8a",
+                        "on-primary": "#ffffff",
+                        "on-secondary-container": "#576378",
+                        "on-surface-variant": "#41474f",
+                        "surface-container-high": "#e9e8e4",
+                        "tertiary-fixed": "#ffdcbd",
+                        "on-primary-container": "#a0d0ff",
+                        "inverse-surface": "#30312e",
+                        "surface-container": "#efeeea",
+                        "inverse-on-surface": "#f2f1ed",
+                        "surface-variant": "#e3e2df",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-container": "#7e4900",
+                        "secondary": "#535f74",
+                        "on-error": "#ffffff",
+                        "surface-tint": "#1e6393",
+                        "error": "#ba1a1a",
+                        "on-error-container": "#93000a",
+                        "surface-container-highest": "#e3e2df",
+                        "on-primary-fixed-variant": "#004a75",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed": "#001d32",
+                        "outline-variant": "#c1c7d0",
+                        "surface": "#faf9f5",
+                        "primary-fixed": "#cde5ff",
+                        "secondary-container": "#d4e0f9"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "16px",
+                        "gutter": "24px",
+                        "margin-desktop": "40px",
+                        "container-max": "1200px",
+                        "unit": "8px"
+                    },
+                    "fontFamily": {
+                        "label-caps": ["IBM Plex Mono"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Noto Serif"],
+                        "meta-sm": ["IBM Plex Mono"],
+                        "display-lg": ["Noto Serif"],
+                        "headline-sm": ["Noto Serif"]
+                    },
+                    "fontSize": {
+                        "label-caps": ["12px", { "lineHeight": "1.0", "letterSpacing": "0.1em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-md": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "meta-sm": ["11px", { "lineHeight": "1.4", "fontWeight": "400" }],
+                        "display-lg": ["48px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-sm": ["24px", { "lineHeight": "1.4", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #0F1B2D;
+            color: #f5f4f0;
+        }
+        .dark-card {
+            background-color: #1a2639;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3), 0px 1px 3px rgba(0, 0, 0, 0.2);
+        }
+        .glow-accent {
+            box-shadow: 0 0 15px rgba(149, 204, 255, 0.2);
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<header class="bg-surface dark:bg-inverse-surface text-primary dark:text-primary-fixed-dim font-headline-sm text-headline-sm font-label-caps text-label-caps docked full-width top-0 sticky border-b border-outline-variant dark:border-outline flat no shadows scale-95 active:scale-90 transition-transform h-[72px] flex justify-between items-center px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto w-full z-50">
+<div class="flex items-center gap-2 font-headline-sm text-headline-sm text-primary dark:text-primary-fixed-dim font-bold">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">shield</span>
+<span>TrustLab</span>
+</div>
+<nav class="hidden md:flex gap-6 items-center">
+<a class="text-primary dark:text-primary-fixed-dim border-b-2 border-primary dark:border-primary-fixed-dim pb-1 font-label-caps text-label-caps" href="#">Feed</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors font-label-caps text-label-caps" href="#">Quiz</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors font-label-caps text-label-caps" href="#">Submit</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="flex items-center gap-1 font-label-caps text-label-caps bg-primary-container text-on-primary rounded-full px-3 py-1 hover:bg-surface-tint transition-all">
+<span class="material-symbols-outlined text-sm">language</span>
+<span>EN</span>
+<span class="text-on-primary/50 mx-1">|</span>
+<span class="text-on-primary/50 hover:text-on-primary transition-colors">ქარ</span>
+</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow max-w-container-max mx-auto w-full px-margin-mobile md:px-margin-desktop py-gutter grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- Left Sidebar / Filters (Desktop) -->
+<aside class="hidden md:block col-span-3 space-y-6">
+<div class="dark-card rounded-lg p-4">
+<h3 class="font-label-caps text-label-caps text-secondary-fixed-dim mb-4">Verification Status</h3>
+<div class="space-y-2">
+<label class="flex items-center gap-2 cursor-pointer">
+<input checked="" class="rounded border-outline-variant bg-transparent text-primary-fixed-dim focus:ring-primary-fixed-dim" type="checkbox"/>
+<span class="font-body-md text-body-md text-surface-container-low">Verified True</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer">
+<input checked="" class="rounded border-outline-variant bg-transparent text-error focus:ring-error" type="checkbox"/>
+<span class="font-body-md text-body-md text-surface-container-low">Verified False</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer">
+<input class="rounded border-outline-variant bg-transparent text-tertiary-fixed-dim focus:ring-tertiary-fixed-dim" type="checkbox"/>
+<span class="font-body-md text-body-md text-surface-container-low">Under Investigation</span>
+</label>
+</div>
+</div>
+</aside>
+<!-- Feed Grid -->
+<section class="col-span-1 md:col-span-9 grid grid-cols-1 lg:grid-cols-2 gap-gutter pb-24 md:pb-8">
+<!-- Evidence Card 1 -->
+<article class="dark-card rounded-xl overflow-hidden flex flex-col border border-outline/20 hover:border-primary-fixed-dim/50 transition-colors">
+<div class="relative h-48 w-full bg-surface-container-highest">
+<img class="object-cover w-full h-full opacity-80 mix-blend-luminosity" data-alt="A dark-themed newsroom digital dashboard showing satellite imagery analysis, high contrast UI, modern investigation aesthetics, deep navy and cyan tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDiaR9B46RMQJeQ5WTPhPh6opq0CpyEkHa17vdt1qxc6I0OEEikDJug97J4oXGUw2_YXQyZE-B_LMIJrhbjOY5HQVTVGTowBsh0jphB-CMLjqXpOl1Q9S7newcxmoQ1wY59FkKsYutnl_OO5i9Wmmzu2db6aLZlBGUGcqp0niPrPduLBDxKklwIQENbHAfyhMykrAzHoK7xy01NgTOGJryuOF3JM_rRe-uwBetFVOWJKZ06Jed0gENuBA"/>
+<div class="absolute top-4 left-4 bg-error/10 text-error-container font-label-caps text-label-caps px-2 py-1 rounded-sm border border-error/20 flex items-center gap-1 backdrop-blur-md">
+<span class="material-symbols-outlined text-[14px]">cancel</span>
+                        DISINFORMATION
+                    </div>
+</div>
+<div class="p-6 flex flex-col flex-grow">
+<span class="font-label-caps text-label-caps text-primary-fixed-dim mb-2">GEOPOLITICS</span>
+<h2 class="font-headline-sm text-headline-sm text-surface-bright mb-4">Fabricated claims regarding recent border skirmishes circulate on Telegram.</h2>
+<p class="font-body-md text-body-md text-secondary-fixed-dim line-clamp-3 mb-6 flex-grow">OSINT analysis confirms that video footage attributed to the border conflict was actually recorded during a military exercise in 2019. Metadata extraction reveals the original creation date.</p>
+<div class="mt-auto pt-4 border-t border-outline/20 flex justify-between items-center font-meta-sm text-meta-sm text-surface-variant">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">calendar_today</span>
+                            Oct 24, 2024
+                        </div>
+<a class="text-primary-fixed-dim hover:underline flex items-center gap-1" href="#">
+                            View Evidence
+                            <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</a>
+</div>
+</div>
+</article>
+<!-- Evidence Card 2 -->
+<article class="dark-card rounded-xl overflow-hidden flex flex-col border border-outline/20 hover:border-primary-fixed-dim/50 transition-colors">
+<div class="relative h-48 w-full bg-surface-container-highest">
+<img class="object-cover w-full h-full opacity-80 mix-blend-luminosity" data-alt="Dark mode digital interface showing a deep fake video analysis with mesh overlays, high-tech forensic style, blue and green neon accents." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBK3Bmcw6DrzD6UN6HuTko18ybHHNt_uMVcJeGdstzmPSm7TtBS3H_zulvyyqCf4R0ZzF3t3bam1pCZCbAAXyjmRu5zAve1PUgFo4BpRouHIwq58zt6C-e_GvImXGzan4KbjHdeTvJ2-sN-YjKXwGtieYJNVG6fBqxjHrhlGxMHQFEIvEYtLKbi11NUZhb1BE9ebj1XWfj4J4Hr6LLzdes2uFWvOc4-_bB4IP8ipNu9Miiuj5Z50XYP_A"/>
+<div class="absolute inset-0 bg-inverse-surface/80 backdrop-blur-md flex flex-col items-center justify-center text-center p-4">
+<span class="material-symbols-outlined text-4xl text-outline mb-2">lock</span>
+<span class="font-label-caps text-label-caps text-surface-container-low mb-4">SENSITIVE CONTENT</span>
+<button class="bg-transparent border border-primary-fixed-dim text-primary-fixed-dim font-label-caps text-label-caps px-4 py-2 rounded-full hover:bg-primary-fixed-dim/10 transition-colors">REVEAL EVIDENCE</button>
+</div>
+</div>
+<div class="p-6 flex flex-col flex-grow">
+<span class="font-label-caps text-label-caps text-primary-fixed-dim mb-2">DEEP FAKE</span>
+<h2 class="font-headline-sm text-headline-sm text-surface-bright mb-4">Manipulated audio recording targets regional official.</h2>
+<p class="font-body-md text-body-md text-secondary-fixed-dim line-clamp-3 mb-6 flex-grow">Spectral analysis indicates anomalies consistent with AI voice cloning. The ambient background noise profile does not match the alleged recording environment.</p>
+<div class="mt-auto pt-4 border-t border-outline/20 flex justify-between items-center font-meta-sm text-meta-sm text-surface-variant">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">calendar_today</span>
+                            Oct 22, 2024
+                        </div>
+<a class="text-primary-fixed-dim hover:underline flex items-center gap-1" href="#">
+                            View Evidence
+                            <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</a>
+</div>
+</div>
+</article>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="bg-surface dark:bg-inverse-surface text-primary dark:text-primary-fixed-dim font-label-caps text-label-caps docked full-width bottom-0 md:hidden border-t border-outline-variant dark:border-outline shadow-lg transition-all duration-200 ease-in-out fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-16 px-4">
+<a class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary text-on-primary-container dark:text-on-primary rounded-full px-4 py-1" href="#">
+<span class="material-symbols-outlined">rss_feed</span>
+<span>Feed</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant px-4 py-1 hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors rounded-full" href="#">
+<span class="material-symbols-outlined">quiz</span>
+<span>Quiz</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant px-4 py-1 hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors rounded-full" href="#">
+<span class="material-symbols-outlined">publish</span>
+<span>Submit</span>
+</a>
+</nav>
+<!-- Footer -->
+<footer class="bg-surface-container-low dark:bg-surface-container-lowest text-on-surface dark:text-on-surface font-body-md text-body-md font-label-caps text-label-caps full-width border-t border-outline-variant dark:border-outline flat py-12 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto flex flex-col md:flex-row justify-between items-center gap-4 hidden md:flex">
+<div class="font-headline-sm text-headline-sm text-primary dark:text-primary-fixed-dim font-bold flex items-center gap-2 opacity-80 hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined">shield</span>
+<span>TrustLab</span>
+</div>
+<div class="flex gap-6">
+<a class="text-on-surface-variant hover:underline hover:text-primary font-label-caps text-label-caps" href="#">Prototype</a>
+<a class="text-on-surface-variant hover:underline hover:text-primary font-label-caps text-label-caps" href="#">Georgian</a>
+<a class="text-on-surface-variant hover:underline hover:text-primary font-label-caps text-label-caps" href="#">Armenian</a>
+<a class="text-primary font-bold hover:underline hover:text-primary font-label-caps text-label-caps" href="#">English</a>
+</div>
+<div class="text-on-surface-variant font-meta-sm text-meta-sm">
+            © 2024 TrustLab Evidence Desk
+        </div>
+</footer>
+</body></html>
