@@ -1,130 +1,93 @@
-# MythBusters Caucasus
+# TrustLab (package name: mythbusters-caucasus)
 
-Crowdsourced fact-checking and myth-busting platform targeting regional
-disinformation in Georgia and Armenia. Trilingual (Georgian / Armenian /
-English), with a public feed, a claim submission flow, and a protected editor
-dashboard.
+Crowdsourced fact-checking against regional disinformation in Georgia and
+Armenia. Trilingual (ka / hy / en): public feed, claim submission, and an
+editor dashboard where a human decides everything that gets published.
 
-Built with **Next.js (App Router, TypeScript)**, **Tailwind CSS**, and
-shadcn-style UI primitives. The prototype ships with a **mock, client-side data
-layer** (in `src/lib/store.tsx`) so it runs on Vercel with zero backend setup.
+Stack: **Next.js 15 (App Router, TypeScript)**, **Tailwind CSS**,
+**Supabase** (Postgres + Auth + Storage), optional **Gemini** risk signal
+(admin-only).
 
----
+## Architecture in one paragraph
 
-## 1. Run locally (VS Code)
+The browser never writes to the database. Public pages read published claims
+from `GET /api/claims`; submissions go to `POST /api/claims` (validated,
+rate-limited, always created as `pending`). Admins sign in with Supabase Auth;
+the role comes from the `admin_users` table. `src/middleware.ts` gates
+`/admin/*`, `/api/admin/*` and `/api/analyze` (fail-closed), and each route
+handler re-checks with `requireAdmin()`. Admin decisions (publish / reject /
+restore) call the SQL function `admin_update_claim`, which changes the claim
+and writes the `audit_log` row **in one transaction**. Rejecting never
+deletes: the claim gets `state = 'rejected'` plus a mandatory reason.
+
+## Setup
 
 ```bash
-# 1. Install dependencies
 npm install
-
-# 2. Start the dev server
-npm run dev
-# open http://localhost:3000
+cp .env.example .env.local   # then fill it in (see below)
+npm run dev                  # http://localhost:3000
 ```
 
-Other scripts:
+### 1. Supabase project
+
+1. Create a project at https://supabase.com.
+2. SQL editor: run `supabase/migrations/0001_schema.sql`, then
+   `0002_admin_claim_actions.sql` (or use the Supabase CLI: `supabase db push`).
+3. Authentication → Users → **Add user** (email + password, auto-confirm).
+4. Make that user an admin: adapt and run `supabase/create_admin.example.sql`.
+5. Project Settings → API: copy the URL, `anon` key and `service_role` key
+   into `.env.local`. The service-role key is **server only**; never prefix it
+   with `NEXT_PUBLIC_`.
+
+### 2. Optional demo data
 
 ```bash
-npm run build   # production build
-npm run start   # serve the production build
-npm run lint    # eslint
+npm run seed -- --yes   # fictional demo claims; NOT for production projects
 ```
 
-Admin panel: go to `/admin` and sign in with the demo password **`caucasus`**.
+### 3. Gemini (optional)
 
-## 2. Push to GitHub
+Set `GEMINI_API_KEY` to enable `POST /api/analyze` (admin-only, rate-limited).
+Its output is a risk signal for the editor, never a verdict.
 
-```bash
-git init
-git add .
-git commit -m "MythBusters Caucasus — MVP prototype"
-git branch -M main
-git remote add origin https://github.com/<you>/mythbusters-caucasus.git
-git push -u origin main
-```
+## Scripts
 
-## 3. Deploy to Vercel
+| Script | What |
+|---|---|
+| `npm run dev` / `build` / `start` | Next.js |
+| `npm run lint` | ESLint (flat config, `next/core-web-vitals`) |
+| `npm run typecheck` | `tsc --noEmit` |
+| `npm run seed -- --yes` | load demo claims (needs Node >= 22.18) |
 
-- Import the GitHub repo at https://vercel.com/new
-- Framework preset is auto-detected as **Next.js** — no env vars needed for the
-  prototype. Click **Deploy**.
+CI (`.github/workflows/ci.yml`) runs install, lint, typecheck and build.
 
-Or from the CLI:
+## Known limitations
 
-```bash
-npm i -g vercel
-vercel        # preview
-vercel --prod # production
-```
-
----
+- The rate limiter (`src/lib/rate-limit.ts`) is in-memory, per server
+  instance. Replace with Redis/Upstash before relying on it at scale.
+- Evidence file upload and comments have tables + RLS but no UI/API yet.
+- Admin sessions use Supabase's cookie session; there is no MFA yet.
+- Translations of newly added admin strings (hy/ka) need native-speaker review.
 
 ## Project structure
 
 ```
-mythbusters-caucasus/
-├── messages/                  # i18n dictionaries (ka / hy / en)
-│   ├── ka.json
-│   ├── hy.json
-│   └── en.json
-├── src/
-│   ├── app/
-│   │   ├── layout.tsx         # fonts, providers, navbar, footer
-│   │   ├── page.tsx           # homepage / feed
-│   │   ├── globals.css
-│   │   ├── providers.tsx      # I18nProvider + StoreProvider
-│   │   ├── submit/page.tsx    # claim submission
-│   │   ├── claim/[id]/page.tsx# claim detail
-│   │   └── admin/page.tsx     # protected dashboard
-│   ├── components/
-│   │   ├── navbar.tsx
-│   │   ├── language-switcher.tsx
-│   │   ├── verdict-badge.tsx  # signature "stamp" element
-│   │   ├── claim-card.tsx
-│   │   ├── claim-feed.tsx     # feed + filters + search
-│   │   ├── submission-form.tsx
-│   │   ├── admin/
-│   │   │   ├── admin-dashboard.tsx
-│   │   │   ├── editor.tsx     # verify + publish a claim
-│   │   │   └── analytics.tsx
-│   │   └── ui/                # shadcn-style primitives
-│   ├── lib/
-│   │   ├── i18n.tsx           # locale context + t()
-│   │   ├── store.tsx          # mock data layer (localStorage)
-│   │   ├── types.ts
-│   │   └── utils.ts
-│   └── data/
-│       └── claims.ts          # trilingual seed data
-├── tailwind.config.ts
-└── next.config.mjs
+messages/                 i18n dictionaries (ka / hy / en)
+supabase/migrations/      SQL schema + admin_update_claim function
+scripts/seed.mjs          demo data loader
+src/
+  middleware.ts           server-side gate for admin surface
+  app/
+    api/claims            public feed + submission
+    api/admin/*           admin-only: list, claim actions, whoami
+    api/analyze           admin-only Gemini risk signal
+    admin, admin/login    editor dashboard + sign-in
+    claim/[id], submit, quiz, page.tsx
+  lib/
+    auth.ts               getAdmin / requireAdmin
+    supabase/             browser, server, service-role clients
+    validation.ts         server-side input rules (URL allowlist etc.)
+    claims-mapper.ts      DB row -> Claim
+    rate-limit.ts, admin-api.ts, store.tsx, i18n.tsx, types.ts
+  data/claims.ts          demo seed content (used only by scripts/seed.mjs)
 ```
-
-## How the pieces work
-
-- **i18n** — Dictionaries live in `messages/*.json`. `I18nProvider` exposes
-  `t("some.key", { param })` and a `setLocale`. The navbar switcher persists the
-  choice to `localStorage`. Font stacks in `tailwind.config.ts` list Noto
-  Georgian → Noto Armenian → Noto Latin, so each script renders in the right
-  face automatically.
-- **Data** — `StoreProvider` seeds from `src/data/claims.ts`, persists changes
-  to `localStorage`, and exposes `addSubmission`, `publishClaim`, `rejectClaim`.
-  Public submissions land as `pending`; the editor assigns a verdict, writes the
-  trilingual response, adds sources, and publishes.
-- **Verdicts** — `fake` / `manipulative` / `true`, plus `pending` for the queue.
-
-## Going to production
-
-Swap the mock store for a real backend without touching the UI:
-
-1. **Supabase** — create `claims` and `submissions` tables mirroring
-   `src/lib/types.ts`; replace the bodies of `addSubmission` / `publishClaim` /
-   `rejectClaim` with Supabase calls; gate `/admin` with Supabase Auth + RLS.
-2. **i18n / SEO** — migrate `messages/*.json` to
-   [`next-intl`](https://next-intl.dev) with `[locale]` routes for per-language
-   URLs. The dictionary keys already match.
-3. **Uploads** — accept real image uploads (Supabase Storage / Vercel Blob)
-   instead of image URLs.
-
-The demo admin password is hard-coded in
-`src/components/admin/admin-dashboard.tsx` — replace it with real auth before
-shipping.
