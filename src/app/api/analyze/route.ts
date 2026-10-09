@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { requireAdmin } from "@/lib/auth";
+import { rateLimit } from "@/lib/rate-limit";
 
 const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
@@ -72,7 +74,23 @@ function isAnalyzeResult(value: unknown): value is AnalyzeResult {
   );
 }
 
+/**
+ * Admin-only: the Gemini key and quota belong to the editorial team. Auth is
+ * enforced twice (middleware + here). The key is read from the server env only.
+ * The result is a risk signal for a human editor — never a published verdict.
+ */
 export async function POST(req: NextRequest) {
+  const admin = await requireAdmin();
+  if (admin instanceof NextResponse) return admin;
+
+  const limited = rateLimit(`analyze:${admin.userId}`, 10, 60 * 1000);
+  if (!limited.ok) {
+    return NextResponse.json(
+      { error: "Too many requests. Try again shortly." },
+      { status: 429, headers: { "Retry-After": String(limited.retryAfterSec) } },
+    );
+  }
+
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     return NextResponse.json(
