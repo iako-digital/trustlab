@@ -4,6 +4,9 @@ export const LOCALES: Locale[] = ["ka", "hy", "en"];
 export type Verdict = "fake" | "manipulative" | "true";
 export type ClaimStatus = Verdict | "pending";
 
+/** Lifecycle of a submission. `status` is the verdict (or "pending"). */
+export type ClaimState = "pending" | "published" | "rejected";
+
 export type Category = "peace" | "media" | "history" | "society";
 export const CATEGORIES: Category[] = ["peace", "media", "history", "society"];
 
@@ -21,6 +24,8 @@ export interface Claim {
   /** Editor explanation / fact-check, per language. Empty while pending. */
   explanation: Localized;
   status: ClaimStatus;
+  /** Lifecycle state; rejected claims are only ever returned to admins. */
+  state?: ClaimState;
   category: Category;
   /** Language the source content was originally in. */
   sourceLang: Locale;
@@ -32,4 +37,7 @@ export interface Claim {
   verifiedBy?: string;
   submittedAt: string; // ISO date
   verifiedAt?: string; // ISO date
+  /** Admin-only. */
+  rejectReason?: string;
+  rejectedAt?: string; // ISO date
 }
