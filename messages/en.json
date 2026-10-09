@@ -82,7 +82,7 @@
     "login": "Sign in",
     "wrongPassword": "Wrong password. Try again.",
     "logout": "Sign out",
-    "hint": "Demo password: caucasus",
+    "locked": "Admin sign-in is temporarily disabled: server-side authentication is not configured yet.",
     "tabPending": "Queue",
     "tabPublished": "Published",
     "tabAnalytics": "Analytics",
