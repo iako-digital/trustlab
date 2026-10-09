@@ -1,0 +1,42 @@
+import "server-only";
+import { NextResponse } from "next/server";
+import { createServerSupabase } from "@/lib/supabase/server";
+import { isSupabaseConfigured } from "@/lib/supabase/env";
+
+export interface AdminIdentity {
+  userId: string;
+  email: string;
+  displayName: string;
+}
+
+/**
+ * Returns the signed-in admin, or null. The role is read from `admin_users`
+ * under the user's own JWT (RLS lets a user read only their own row), and the
+ * JWT is verified by Supabase via getUser() — never trust getSession() alone.
+ */
+export async function getAdmin(): Promise<AdminIdentity | null> {
+  if (!isSupabaseConfigured()) return null;
+  const supabase = await createServerSupabase();
+  const { data: userData } = await supabase.auth.getUser();
+  const user = userData.user;
+  if (!user) return null;
+
+  const { data: row } = await supabase
+    .from("admin_users")
+    .select("email, display_name, role")
+    .eq("user_id", user.id)
+    .maybeSingle();
+  if (!row || row.role !== "admin") return null;
+
+  return { userId: user.id, email: row.email, displayName: row.display_name };
+}
+
+/** For route handlers: `const a = await requireAdmin(); if (a instanceof NextResponse) return a;` */
+export async function requireAdmin(): Promise<AdminIdentity | NextResponse> {
+  if (!isSupabaseConfigured()) {
+    return NextResponse.json({ error: "Server is not configured." }, { status: 503 });
+  }
+  const admin = await getAdmin();
+  if (!admin) return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+  return admin;
+}
