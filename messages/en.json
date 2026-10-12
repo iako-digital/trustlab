@@ -117,7 +117,27 @@
     "statByStatus": "By verdict",
     "statByLanguage": "By source language",
     "reviewedBy": "You",
-    "titlePlaceholder": "Headline for the check"
+    "titlePlaceholder": "Headline for the check",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "networkError": "Could not reach the server. Check your connection and try again.",
+    "aiTitle": "AI suggestion",
+    "aiPending": "Pending your review",
+    "aiEdited": "Edited",
+    "aiVerdict": "Suggested verdict",
+    "aiEvidence": "Evidence summary",
+    "aiTranslations": "Titles and explanations",
+    "aiApprove": "Approve & publish",
+    "aiEdit": "Edit",
+    "aiReject": "Reject suggestion",
+    "aiSave": "Save changes",
+    "aiGenerate": "Generate AI suggestion",
+    "aiGenerating": "Generating…",
+    "aiNone": "No AI suggestion yet.",
+    "aiIncomplete": "Fill in all three titles and the explanation in the source language (use Edit) before approving.",
+    "aiBusy": "Working…",
+    "aiRateLimited": "Too many requests. Try again shortly.",
+    "aiNotConfigured": "AI is not configured on the server."
   },
   "common": {
     "language": { "ka": "ქართული", "hy": "Հայերեն", "en": "English" }

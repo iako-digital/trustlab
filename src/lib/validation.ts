@@ -137,6 +137,42 @@ export function parsePublish(body: unknown, sourceLang: Locale): Result<PublishP
   return { ok: true, value: { title, explanation, sources, verdict: b.verdict as Verdict } };
 }
 
+export interface SuggestionEdit {
+  verdict: Verdict;
+  evidenceSummary: string;
+  translation: { title: Loc; explanation: Loc };
+}
+
+/**
+ * Edits to an AI suggestion are drafts: titles/explanations may be blank
+ * (approval re-checks completeness in SQL), but sizes and the verdict are enforced.
+ */
+export function parseSuggestionEdit(body: unknown): Result<SuggestionEdit> {
+  if (!body || typeof body !== "object") return { ok: false, error: "Invalid body." };
+  const b = body as Record<string, unknown>;
+  if (!VERDICTS.includes(b.verdict as Verdict)) return { ok: false, error: "verdict" };
+  if (typeof b.evidenceSummary !== "string" || b.evidenceSummary.length > 5000) {
+    return { ok: false, error: "evidenceSummary" };
+  }
+  const tr = (b.translation ?? {}) as Record<string, unknown>;
+  const out = { title: {} as Loc, explanation: {} as Loc };
+  for (const key of ["title", "explanation"] as const) {
+    const src = (tr[key] ?? {}) as Record<string, unknown>;
+    const max = key === "title" ? LIMITS.title : LIMITS.explanation;
+    for (const l of LOCALES) {
+      const v = src[l];
+      if (v != null && (typeof v !== "string" || v.length > max)) {
+        return { ok: false, error: `translation.${key}.${l}` };
+      }
+      out[key][l] = typeof v === "string" ? v.trim() : "";
+    }
+  }
+  return {
+    ok: true,
+    value: { verdict: b.verdict as Verdict, evidenceSummary: b.evidenceSummary.trim(), translation: out },
+  };
+}
+
 export function parseReason(body: unknown): Result<string> {
   const reason = str((body as Record<string, unknown> | null)?.reason, LIMITS.reason);
   return reason ? { ok: true, value: reason } : { ok: false, error: "reason" };

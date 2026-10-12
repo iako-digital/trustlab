@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { Lock } from "lucide-react";
+import { Eye, EyeOff, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,7 +10,7 @@ import { useI18n } from "@/lib/i18n";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { createBrowserSupabase } from "@/lib/supabase/browser";
 
-type Problem = "credentials" | "notAdmin" | "notConfigured" | null;
+type Problem = "credentials" | "notAdmin" | "notConfigured" | "network" | null;
 
 export default function AdminLoginPage() {
   const { t } = useI18n();
@@ -19,6 +19,7 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState("");
   const [problem, setProblem] = useState<Problem>(isSupabaseConfigured() ? null : "notConfigured");
   const [busy, setBusy] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
@@ -26,19 +27,26 @@ export default function AdminLoginPage() {
     setBusy(true);
     setProblem(null);
 
-    const supabase = createBrowserSupabase();
-    const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
-    if (error) {
-      setProblem("credentials");
-      setBusy(false);
-      return;
-    }
+    try {
+      const supabase = createBrowserSupabase();
+      const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+      if (error) {
+        // Supabase reports transport failures as status 0 / fetch errors.
+        setProblem(error.status === 0 || /fetch/i.test(error.message) ? "network" : "credentials");
+        setBusy(false);
+        return;
+      }
 
-    // Signing in is not enough: the server must confirm the admin role.
-    const me = await fetch("/api/admin/me", { cache: "no-store" });
-    if (!me.ok) {
-      await supabase.auth.signOut();
-      setProblem("notAdmin");
+      // Signing in is not enough: the server must confirm the admin role.
+      const me = await fetch("/api/admin/me", { cache: "no-store" });
+      if (!me.ok) {
+        await supabase.auth.signOut();
+        setProblem("notAdmin");
+        setBusy(false);
+        return;
+      }
+    } catch {
+      setProblem("network");
       setBusy(false);
       return;
     }
@@ -69,14 +77,27 @@ export default function AdminLoginPage() {
 
           <div className="mt-4">
             <Label htmlFor="pw">{t("admin.password")}</Label>
-            <Input
-              id="pw"
-              type="password"
-              autoComplete="current-password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+            <div className="relative">
+              <Input
+                id="pw"
+                type={showPassword ? "text" : "password"}
+                autoComplete="current-password"
+                required
+                className="pr-11"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                aria-label={showPassword ? t("admin.hidePassword") : t("admin.showPassword")}
+                aria-pressed={showPassword}
+                title={showPassword ? t("admin.hidePassword") : t("admin.showPassword")}
+                className="absolute inset-y-0 right-0 flex w-11 items-center justify-center rounded-r-2xl text-ink-faint hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
           </div>
 
           {problem && (
@@ -84,6 +105,7 @@ export default function AdminLoginPage() {
               {problem === "credentials" && t("admin.wrongPassword")}
               {problem === "notAdmin" && t("admin.notAdmin")}
               {problem === "notConfigured" && t("admin.notConfigured")}
+              {problem === "network" && t("admin.networkError")}
             </p>
           )}
 

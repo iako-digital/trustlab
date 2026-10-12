@@ -41,3 +41,19 @@ export interface Claim {
   rejectReason?: string;
   rejectedAt?: string; // ISO date
 }
+
+export type AiSuggestionStatus = "pending" | "approved" | "rejected";
+
+/** An AI proposal for a pending claim; only an admin decision makes it public. */
+export interface AiSuggestion {
+  id: string;
+  claimId: string;
+  suggestedVerdict: Verdict;
+  evidenceSummary: string;
+  translation: { title: Localized; explanation: Localized };
+  status: AiSuggestionStatus;
+  /** An admin changed the proposal before deciding. */
+  edited: boolean;
+  model?: string;
+  createdAt: string; // ISO date
+}

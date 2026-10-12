@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { Ban } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,9 +17,12 @@ const VERDICTS: Verdict[] = ["fake", "manipulative", "true"];
 export function ClaimEditor({
   claim,
   onAct,
+  aiPanel,
 }: {
   claim: Claim;
   onAct: (id: string, body: AdminAction) => Promise<boolean>;
+  /** Human-in-the-loop AI suggestion, shown between the submission and the manual form. */
+  aiPanel?: ReactNode;
 }) {
   const { locale, t } = useI18n();
 
@@ -96,6 +99,8 @@ export function ClaimEditor({
           </a>
         )}
       </div>
+
+      {aiPanel}
 
       {/* Verdict + response */}
       <div className="space-y-4 p-5">

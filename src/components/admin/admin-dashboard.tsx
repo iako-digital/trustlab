@@ -6,6 +6,7 @@ import { LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Analytics } from "@/components/admin/analytics";
 import { ClaimEditor } from "@/components/admin/editor";
+import { AiSuggestionPanel } from "@/components/admin/ai-suggestion-panel";
 import { ClaimCard } from "@/components/claim-card";
 import { useAdminClaims } from "@/lib/admin-api";
 import { useI18n } from "@/lib/i18n";
@@ -21,7 +22,7 @@ type Tab = "pending" | "published" | "rejected" | "analytics";
 export function AdminDashboard() {
   const { t, locale } = useI18n();
   const router = useRouter();
-  const { claims, loading, loadFailed, act } = useAdminClaims();
+  const { claims, suggestions, loading, loadFailed, act, decide, generate } = useAdminClaims();
   const [tab, setTab] = useState<Tab>("pending");
   const [me, setMe] = useState<string | null>(null);
 
@@ -100,7 +101,19 @@ export function AdminDashboard() {
         ) : (
           <div className="grid gap-5 lg:grid-cols-2">
             {pending.map((c) => (
-              <ClaimEditor key={c.id} claim={c} onAct={act} />
+              <ClaimEditor
+                key={c.id}
+                claim={c}
+                onAct={act}
+                aiPanel={
+                  <AiSuggestionPanel
+                    claim={c}
+                    suggestion={suggestions.find((s) => s.claimId === c.id)}
+                    onDecide={decide}
+                    onGenerate={generate}
+                  />
+                }
+              />
             ))}
           </div>
         ))}
