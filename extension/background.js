@@ -1,7 +1,7 @@
 // Service worker: fetches published claims from the TrustLab site and caches
 // them. Content scripts ask it for claims, so only this worker needs host access.
 
-const DEFAULT_BASE = "http://localhost:3000";
+const DEFAULT_BASE = "https://trustlab-iota.vercel.app";
 const CACHE_MS = 10 * 60 * 1000;
 
 async function getSettings() {
