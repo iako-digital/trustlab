@@ -38,7 +38,9 @@ export async function getAdmin(): Promise<AdminIdentity | null> {
 
 /** For route handlers: `const a = await requireAdmin(); if (a instanceof NextResponse) return a;` */
 export async function requireAdmin(): Promise<AdminIdentity | NextResponse> {
-  if (!isSupabaseConfigured()) {
+  // Every admin route writes through the service-role client, so a missing key is
+  // a configuration error (503), not an unhandled exception (500).
+  if (!isSupabaseConfigured() || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
     return NextResponse.json({ error: "Server is not configured." }, { status: 503 });
   }
   const admin = await getAdmin();

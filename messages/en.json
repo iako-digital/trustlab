@@ -137,10 +137,7 @@
     "aiIncomplete": "Fill in all three titles and the explanation in the source language (use Edit) before approving.",
     "aiBusy": "Working…",
     "aiRateLimited": "Too many requests. Try again shortly.",
-    "aiNotConfigured": "AI is not configured on the server.",
-    "google": "Sign in with Google",
-    "or": "or",
-    "oauthError": "Google sign-in failed. Please try again."
+    "aiNotConfigured": "AI is not configured on the server."
   },
   "common": {
     "language": {

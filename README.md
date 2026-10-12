@@ -62,20 +62,19 @@ are optional overrides.
 ### How to sign in
 
 1. Open **`/admin/login`** (opening `/admin` while signed out redirects there).
-2. Either enter your email and password, or click **Sign in with Google**.
+2. Enter your email and password (Supabase Auth `signInWithPassword`).
 3. You land on **`/admin`**. If the account is not an admin you are signed out
    and see "This account does not have admin access".
 
 Being signed in is not enough: the role comes from the `public.admin_users`
-table, checked in middleware, in the Google callback and again in every API route.
+table, checked in middleware and again in every API route.
 
 ### Admin URLs
 
 | Path | What |
 |---|---|
-| `/admin/login` | sign-in (email + password, Google) |
+| `/admin/login` | sign-in (email + password) |
 | `/admin` | dashboard: Queue (with AI suggestions), Published, Rejected, Analytics |
-| `/auth/callback` | Google OAuth return URL (not opened by hand) |
 | `GET /api/admin/me` | who am I (used by login) |
 | `GET /api/admin/claims` | all claims, every state |
 | `POST /api/admin/claims/[id]` | `publish` / `reject` / `restore` |
@@ -88,27 +87,10 @@ Every action above is written to `public.audit_log`.
 
 ### Creating an admin
 
-Email + password:
-1. Supabase dashboard → Authentication → Users → **Add user** (auto-confirm).
+1. Supabase dashboard → Authentication → Users → **Add user** (email + password, auto-confirm).
 2. Run `supabase/create_admin.example.sql` with that email.
 
-Google:
-1. Supabase → Authentication → Sign In / Providers → **Google**: enable it and
-   paste a Google OAuth client ID and secret (Google Cloud Console → APIs &
-   Services → Credentials → OAuth client, type *Web application*; add the
-   Authorized redirect URI shown in the Supabase Google provider panel,
-   `https://<project-ref>.supabase.co/auth/v1/callback`).
-2. Supabase → Authentication → URL Configuration: add
-   `http://localhost:3000/auth/callback` and your production
-   `https://<your-domain>/auth/callback` to **Redirect URLs**.
-3. The person clicks **Sign in with Google** once. They are refused (they are
-   not an admin yet), but Supabase has now created their user.
-4. Grant the role with `supabase/create_admin.example.sql` using their Google
-   email. They can now sign in with Google.
-
 Revoke access with `delete from public.admin_users where email = '...';`.
-To stop strangers creating accounts at all, disable "Allow new users to sign
-up" after the admins exist (existing users can still sign in).
 
 ## Scripts
 
