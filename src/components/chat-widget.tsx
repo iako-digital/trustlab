@@ -60,7 +60,11 @@ export function ChatWidget() {
             ? t("chat.rateLimited")
             : json.code === "not_configured"
               ? t("chat.notConfigured")
-              : t("chat.error"),
+              : json.code === "quota"
+                ? t("chat.quota")
+                : json.code === "busy"
+                  ? t("chat.busy")
+                  : t("chat.error"),
         );
       }
     } catch {

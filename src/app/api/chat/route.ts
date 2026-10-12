@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { clientIp, rateLimit } from "@/lib/rate-limit";
-import { GEMINI_MODEL, geminiGenerate } from "@/lib/gemini";
+import { geminiText } from "@/lib/gemini";
 
 export const dynamic = "force-dynamic";
 
@@ -56,6 +56,7 @@ export async function POST(req: NextRequest) {
     );
   }
   if (!process.env.GEMINI_API_KEY) {
+    console.error("[api/chat] GEMINI_API_KEY is not set in process.env");
     return NextResponse.json({ error: "Chat is not configured.", code: "not_configured" }, { status: 503 });
   }
 
@@ -68,7 +69,7 @@ export async function POST(req: NextRequest) {
   const messages = parseMessages(body);
   if (!messages) return NextResponse.json({ error: "Invalid messages." }, { status: 400 });
 
-  const res = await geminiGenerate(GEMINI_MODEL, {
+  const { res, model, failures } = await geminiText({
     systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
     contents: messages.map((m) => ({
       role: m.role === "user" ? "user" : "model",
@@ -76,22 +77,33 @@ export async function POST(req: NextRequest) {
     })),
     generationConfig: { temperature: 0.3, maxOutputTokens: 2048 },
   });
+
   if (!res || !res.ok) {
-    console.error("chat: Gemini request failed", res?.status, res && (await res.text().catch(() => "")).slice(0, 300));
-    return NextResponse.json({ error: "The assistant is unavailable right now." }, { status: 502 });
+    // Full detail goes to the server log; the client gets a coarse, actionable code.
+    console.error("[api/chat] Gemini request failed:", failures);
+    const status = res?.status;
+    const code = status === 429 ? "quota" : status === 503 ? "busy" : "upstream";
+    return NextResponse.json(
+      { error: "The assistant is unavailable right now.", code },
+      { status: code === "upstream" ? 502 : 503 },
+    );
   }
+  if (failures.length > 0) console.warn(`[api/chat] answered by fallback model ${model}; earlier:`, failures);
 
   const payload = (await res.json().catch(() => null)) as {
-    candidates?: { content?: { parts?: { text?: string }[] } }[];
+    candidates?: { finishReason?: string; content?: { parts?: { text?: string }[] } }[];
   } | null;
   const reply = payload?.candidates?.[0]?.content?.parts
     ?.map((p) => p.text ?? "")
     .join("")
     .trim();
   if (!reply) {
-    console.error("chat: empty reply", JSON.stringify(payload).slice(0, 400));
+    console.error("[api/chat] empty reply from", model, JSON.stringify(payload).slice(0, 400));
+    return NextResponse.json(
+      { error: "The assistant returned no answer.", code: "upstream" },
+      { status: 502 },
+    );
   }
-  if (!reply) return NextResponse.json({ error: "The assistant returned no answer." }, { status: 502 });
 
   return NextResponse.json({ reply }, { headers: { "Cache-Control": "no-store" } });
 }

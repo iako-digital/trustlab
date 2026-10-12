@@ -3,6 +3,14 @@ import "server-only";
 export const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-flash-latest";
 export const GEMINI_TTS_MODEL = process.env.GEMINI_TTS_MODEL || "gemini-3.8-flash-tts";
 
+/**
+ * Text models tried in order. Free-tier quota is per model, so when the primary
+ * is exhausted (429) or retired (404) the next one usually still answers.
+ * (gemini-1.5-* and gemini-2.0-* are retired; 2.5-* is closed to new keys.)
+ */
+const FALLBACK_MODELS = ["gemini-3.5-flash", "gemini-flash-lite-latest"];
+export const TEXT_MODELS = [...new Set([GEMINI_MODEL, ...FALLBACK_MODELS])];
+
 const BASE = "https://generativelanguage.googleapis.com/v1beta/models";
 
 /**
@@ -31,4 +39,28 @@ export async function geminiGenerate(model: string, body: unknown): Promise<Resp
     }
   }
   return null;
+}
+
+export interface TextResult {
+  res: Response | null;
+  /** The model that produced `res` (or the last one tried). */
+  model: string;
+  /** Why the last attempt failed, for logs: "<model>: <status> <message>". */
+  failures: string[];
+}
+
+/** Like geminiGenerate, but falls through TEXT_MODELS on 404/429/503. */
+export async function geminiText(body: unknown): Promise<TextResult> {
+  const failures: string[] = [];
+  let last: { res: Response | null; model: string } = { res: null, model: TEXT_MODELS[0] };
+  for (const model of TEXT_MODELS) {
+    const res = await geminiGenerate(model, body);
+    last = { res, model };
+    if (res?.ok) return { ...last, failures };
+    const detail = res ? (await res.clone().text().catch(() => "")).slice(0, 200) : "network error / no key";
+    failures.push(`${model}: ${res?.status ?? "no response"} ${detail.replace(/\s+/g, " ")}`);
+    // Only these statuses are model-specific; anything else (400, 401, 403) will fail everywhere.
+    if (res && ![404, 429, 503].includes(res.status)) break;
+  }
+  return { ...last, failures };
 }

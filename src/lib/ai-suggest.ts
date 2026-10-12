@@ -1,8 +1,7 @@
 import "server-only";
 import { LOCALES, type Locale, type Verdict } from "@/lib/types";
+import { geminiText } from "@/lib/gemini";
 
-const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-flash-latest";
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 
 const SYSTEM_PROMPT = `You are an AI assistant for the fact-checking editors of "TrustLab", which debunks disinformation in the South Caucasus (Georgia and Armenia).
 You receive a submitted claim. Propose, for a HUMAN editor to review:
@@ -50,16 +49,15 @@ export async function generateSuggestion(
   if (!apiKey) return { ok: false, error: "not_configured" };
 
   try {
-    const res = await fetch(GEMINI_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
-        contents: [{ role: "user", parts: [{ text: claimText }] }],
-        generationConfig: { responseMimeType: "application/json", responseSchema: RESPONSE_SCHEMA },
-      }),
+    const { res, model, failures } = await geminiText({
+      systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+      contents: [{ role: "user", parts: [{ text: claimText }] }],
+      generationConfig: { responseMimeType: "application/json", responseSchema: RESPONSE_SCHEMA },
     });
-    if (!res.ok) return { ok: false, error: "upstream" };
+    if (!res || !res.ok) {
+      console.error("[ai-suggest] Gemini request failed:", failures);
+      return { ok: false, error: "upstream" };
+    }
     const payload = (await res.json()) as {
       candidates?: { content?: { parts?: { text?: string }[] } }[];
     };
@@ -83,7 +81,7 @@ export async function generateSuggestion(
           title: { ka: r.title.ka.slice(0, 300), hy: r.title.hy.slice(0, 300), en: r.title.en.slice(0, 300) },
           explanation: r.explanation,
         },
-        model: GEMINI_MODEL,
+        model,
       },
     };
   } catch {

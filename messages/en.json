@@ -271,6 +271,8 @@
     "thinking": "Typing…",
     "error": "The assistant is unavailable right now. Please try again.",
     "rateLimited": "Too many messages. Please wait a moment.",
-    "notConfigured": "The assistant is not configured yet."
+    "notConfigured": "The assistant is not configured yet.",
+    "quota": "The assistant has reached its daily limit. Please try again later.",
+    "busy": "The assistant is very busy right now. Please try again in a moment."
   }
 }
