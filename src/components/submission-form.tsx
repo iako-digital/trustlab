@@ -79,7 +79,7 @@ export function SubmissionForm() {
   if (done) {
     return (
       <div className="rounded-2xl border border-verdict-true/30 bg-verdict-truebg p-8 text-center">
-        <CheckCircle2 className="mx-auto mb-3 h-10 w-10 text-verdict-true" />
+        <CheckCircle2 className="mx-auto mb-3 h-10 w-10 text-verdict-trueink" />
         <h2 className="font-serif text-xl font-semibold text-ink">{t("submit.successTitle")}</h2>
         <p className="mx-auto mt-2 max-w-prose text-sm text-ink-soft">{t("submit.successBody")}</p>
         <Button onClick={reset} variant="outline" className="mt-5">
@@ -203,7 +203,7 @@ export function SubmissionForm() {
         />
 
         {failed && (
-          <p role="alert" className="text-sm text-verdict-fake">
+          <p role="alert" className="text-sm text-verdict-fakeink">
             {t("submit.error")}
           </p>
         )}
@@ -217,5 +217,5 @@ export function SubmissionForm() {
 }
 
 function FieldError({ children }: { children: React.ReactNode }) {
-  return <p className="mt-1 text-xs text-verdict-fake">{children}</p>;
+  return <p className="mt-1 text-xs text-verdict-fakeink">{children}</p>;
 }

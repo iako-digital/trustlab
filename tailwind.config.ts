@@ -12,26 +12,35 @@ const config: Config = {
       colors: {
         // Editorial "evidence desk" palette — ink + paper + a 3-verdict system.
         ink: {
-          DEFAULT: "#0F1B2D", // deep newsroom navy-black
-          soft: "#33415C",
-          faint: "#6B7789",
+          DEFAULT: "#0B2D5B", // Navy: headings, primary buttons, dark surfaces
+          soft: "#1F2937", // Slate: body text
+          faint: "#5B6B82", // muted text (AA on white and on paper)
         },
         paper: {
-          DEFAULT: "#F7F6F2", // clean archival off-white (not the terracotta-cream tell)
+          DEFAULT: "#F3F6FB", // page background
           card: "#FFFFFF",
-          line: "#E4E1D8",
+          line: "#D6E4F7", // light-blue hairlines
+          tint: "#E6F1FF", // Light Blue: subtle containers and highlights
         },
         verdict: {
-          fake: "#C1272D",     // regional red
-          fakebg: "#FBECEC",
-          manip: "#B7791F",    // amber ochre
-          manipbg: "#FBF2E1",
-          true: "#2E7D5B",     // evidence green
-          truebg: "#E7F2EC",
-          pending: "#4B5C74",
-          pendingbg: "#ECEFF3",
+          // Fill/border colors; use the *ink variants for small text (AA contrast).
+          fake: "#EF4444", // alert red: untrusted / misinformation
+          fakeink: "#B91C1C",
+          fakebg: "#FEF0F0",
+          manip: "#D97706", // amber: manipulative
+          manipink: "#92400E",
+          manipbg: "#FEF4E0",
+          true: "#10B981", // emerald/teal: verified
+          trueink: "#047857",
+          truebg: "#E6F8F1",
+          pending: "#475569",
+          pendingbg: "#E6F1FF",
         },
-        brand: "#0E5A8A", // signal blue used sparingly for links/actions
+        brand: {
+          DEFAULT: "#2563EB", // Royal Blue: links, hover, interaction
+          navy: "#0B2D5B",
+        },
+        accent: "#10B981", // Teal Green: success, progress, badges
       },
       fontFamily: {
         serif: [
@@ -60,7 +69,8 @@ const config: Config = {
         card: "10px",
       },
       boxShadow: {
-        card: "0 1px 2px rgba(15,27,45,0.04), 0 8px 24px -12px rgba(15,27,45,0.12)",
+        card: "0 1px 2px rgba(11,45,91,0.06), 0 10px 28px -14px rgba(11,45,91,0.22)",
+        lux: "0 2px 4px rgba(11,45,91,0.08), 0 20px 44px -16px rgba(11,45,91,0.38)",
       },
       maxWidth: {
         prose: "68ch",

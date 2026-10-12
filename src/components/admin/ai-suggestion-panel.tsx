@@ -60,7 +60,7 @@ export function AiSuggestionPanel({
           {t("admin.aiNone")}
         </span>
         <div className="flex items-center gap-3">
-          {error && <span role="alert" className="text-xs text-verdict-fake">{error}</span>}
+          {error && <span role="alert" className="text-xs text-verdict-fakeink">{error}</span>}
           <Button variant="outline" size="sm" disabled={busy} onClick={() => run(() => onGenerate(claim.id))}>
             {busy ? t("admin.aiGenerating") : t("admin.aiGenerate")}
           </Button>
@@ -189,7 +189,7 @@ export function AiSuggestionPanel({
       )}
 
       {error && (
-        <p role="alert" className="text-xs text-verdict-fake">
+        <p role="alert" className="text-xs text-verdict-fakeink">
           {error}
         </p>
       )}
@@ -210,7 +210,7 @@ export function AiSuggestionPanel({
               variant="ghost"
               size="sm"
               disabled={busy}
-              className="text-verdict-fake"
+              className="text-verdict-fakeink"
               onClick={() => run(() => onDecide(suggestion.id, { decision: "reject" }))}
             >
               <Ban className="h-4 w-4" />

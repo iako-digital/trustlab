@@ -1,13 +1,24 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Providers } from "./providers";
 import { Navbar } from "@/components/navbar";
+import { Logo } from "@/components/logo";
 
 export const metadata: Metadata = {
   title: "TrustLab — Fact-checking regional disinformation",
   description:
     "Crowdsourced fact-checking against regional fake news in Georgia and Armenia. Verified checks in Georgian, Armenian and English.",
+  icons: { apple: "/logo.png" }, // favicon comes from src/app/icon.svg
+  openGraph: {
+    title: "TrustLab — Fact-checking regional disinformation",
+    description: "Verified fact-checks in Georgian, Armenian and English.",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "TrustLab" }],
+    type: "website",
+  },
+  twitter: { card: "summary_large_image", images: ["/og.png"] },
 };
+
+export const viewport: Viewport = { themeColor: "#0B2D5B" };
 
 export default function RootLayout({
   children,
@@ -40,11 +51,12 @@ export default function RootLayout({
 
 function Footer() {
   return (
-    <footer className="border-t border-paper-line py-8">
+    <footer className="border-t border-paper-line bg-paper-card py-8">
       <div className="container flex flex-col items-center justify-between gap-2 text-center sm:flex-row sm:text-left">
-        <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-ink-faint">
-          TrustLab · Prototype
-        </p>
+        <div className="flex items-center gap-3">
+          <Logo markClassName="h-7" />
+          <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-ink-faint">Prototype</span>
+        </div>
         <p className="text-xs text-ink-faint">
           Crowdsourced fact-checking · ka · hy · en
         </p>

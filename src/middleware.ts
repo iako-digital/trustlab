@@ -20,27 +20,38 @@ export async function middleware(request: NextRequest) {
       : NextResponse.redirect(new URL("/admin/login", request.url));
   }
 
-  let response = NextResponse.next({ request });
-  const supabase = createServerClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-    cookies: {
-      getAll: () => request.cookies.getAll(),
-      setAll: (list) => {
-        list.forEach(({ name, value }) => request.cookies.set(name, value));
-        response = NextResponse.next({ request });
-        list.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
-      },
-    },
-  });
+  const deny = (status: 401 | 503) =>
+    isApi
+      ? NextResponse.json({ error: status === 401 ? "Unauthorized." : "Auth unavailable." }, { status })
+      : NextResponse.redirect(new URL("/admin/login", request.url));
 
-  const { data: userData } = await supabase.auth.getUser();
+  let response = NextResponse.next({ request });
   let isAdmin = false;
-  if (userData.user) {
-    const { data: row } = await supabase
-      .from("admin_users")
-      .select("role")
-      .eq("user_id", userData.user.id)
-      .maybeSingle();
-    isAdmin = row?.role === "admin";
+  try {
+    const supabase = createServerClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      cookies: {
+        getAll: () => request.cookies.getAll(),
+        setAll: (list) => {
+          list.forEach(({ name, value }) => request.cookies.set(name, value));
+          response = NextResponse.next({ request });
+          list.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
+        },
+      },
+    });
+
+    // No session, an expired/corrupt cookie or no admin row all end up as isAdmin = false.
+    const { data: userData } = await supabase.auth.getUser();
+    if (userData.user) {
+      const { data: row } = await supabase
+        .from("admin_users")
+        .select("role")
+        .eq("user_id", userData.user.id)
+        .maybeSingle();
+      isAdmin = row?.role === "admin";
+    }
+  } catch {
+    // Supabase unreachable or misconfigured: never surface a 500; fail closed.
+    return isLoginPage ? NextResponse.next() : deny(503);
   }
 
   if (isLoginPage) {
@@ -48,12 +59,7 @@ export async function middleware(request: NextRequest) {
     return isAdmin ? NextResponse.redirect(new URL("/admin", request.url)) : response;
   }
 
-  if (!isAdmin) {
-    return isApi
-      ? NextResponse.json({ error: "Unauthorized." }, { status: 401 })
-      : NextResponse.redirect(new URL("/admin/login", request.url));
-  }
-  return response;
+  return isAdmin ? response : deny(401);
 }
 
 export const config = {

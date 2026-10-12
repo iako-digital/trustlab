@@ -1,24 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { ShieldCheck } from "lucide-react";
+import { Logo } from "@/components/logo";
 import { useT } from "@/lib/i18n";
 import { LanguageSwitcher } from "@/components/language-switcher";
 
 export function Navbar() {
   const t = useT();
   return (
-    <header className="sticky top-0 z-40 border-b border-paper-line bg-gradient-to-b from-paper/90 to-paper/75 backdrop-blur-md">
+    <header className="sticky top-0 z-40 border-b border-paper-line bg-gradient-to-b from-paper-card/95 to-paper/80 shadow-[0_1px_0_rgba(11,45,91,0.04),0_8px_24px_-18px_rgba(11,45,91,0.35)] backdrop-blur-md">
       <div className="container flex h-16 items-center justify-between gap-4">
-        <Link href="/" className="flex items-center gap-2.5">
-          <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-br from-brand to-ink text-paper shadow-card glow-soft">
-            <ShieldCheck className="h-4.5 w-4.5" strokeWidth={2} />
-          </span>
-          <span className="flex flex-col leading-none">
-            <span className="font-sans text-[17px] font-semibold text-ink">
-              TrustLab
-            </span>
-          </span>
+        <Link href="/" aria-label="TrustLab" className="flex items-center rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">
+          <Logo />
         </Link>
         <nav className="flex items-center gap-2">
           <Link

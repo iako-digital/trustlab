@@ -31,8 +31,8 @@
   /* subtle paper grain via layered gradients */
   .paper-grain {
     background-image:
-      radial-gradient(circle at 20% 10%, rgba(15, 27, 45, 0.02), transparent 40%),
-      radial-gradient(circle at 80% 0%, rgba(14, 90, 138, 0.03), transparent 45%);
+      radial-gradient(circle at 20% 10%, rgba(11, 45, 91, 0.04), transparent 40%),
+      radial-gradient(circle at 80% 0%, rgba(37, 99, 235, 0.06), transparent 45%);
   }
 
   /* Micro-interactions and smooth transitions */
@@ -40,10 +40,10 @@
     transition: all 240ms cubic-bezier(.22,.9,.31,1);
   }
   .btn-primary-glow {
-    box-shadow: 0 6px 18px -8px rgba(14,90,138,0.28), inset 0 -2px 8px rgba(255,255,255,0.02);
+    box-shadow: 0 6px 18px -8px rgba(37,99,235,0.35), inset 0 -2px 8px rgba(255,255,255,0.02);
   }
   .glow-soft {
-    filter: drop-shadow(0 6px 20px rgba(14,90,138,0.12));
+    filter: drop-shadow(0 6px 20px rgba(37,99,235,0.18));
   }
 
   /* Modal + quiz feedback motion */

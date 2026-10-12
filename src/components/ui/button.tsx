@@ -7,10 +7,10 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-ink text-paper hover:bg-ink-soft hover:-translate-y-0.5 active:scale-95",
-        brand: "bg-brand text-white hover:bg-brand/90 hover:scale-105 active:scale-95 btn-primary-glow",
-        outline: "border border-paper-line bg-paper-card text-ink hover:bg-paper",
-        ghost: "text-ink hover:bg-paper",
+        default: "bg-ink text-paper hover:bg-brand hover:-translate-y-0.5 shadow-card active:scale-95",
+        brand: "bg-brand text-white hover:bg-brand-navy hover:scale-105 active:scale-95 btn-primary-glow",
+        outline: "border border-brand-navy/25 bg-paper-card text-ink hover:border-brand hover:bg-paper-tint",
+        ghost: "text-ink hover:bg-paper-tint",
         danger: "bg-verdict-fake text-white hover:bg-verdict-fake/90",
         subtle: "bg-paper text-ink-soft hover:bg-paper-line/60",
       },

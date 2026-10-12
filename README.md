@@ -32,7 +32,7 @@ npm run dev                  # http://localhost:3000
 
 1. Create a project at https://supabase.com.
 2. SQL editor: run `supabase/migrations/0001_schema.sql`, then
-   `0002_admin_claim_actions.sql` (or use the Supabase CLI: `supabase db push`).
+   `0002_admin_claim_actions.sql`, then `0003_ai_suggestions.sql` (or use the Supabase CLI: `supabase db push`).
 3. Authentication → Users → **Add user** (email + password, auto-confirm).
 4. Make that user an admin: adapt and run `supabase/create_admin.example.sql`.
 5. Project Settings → API: copy the URL, `anon` key and `service_role` key
@@ -47,8 +47,68 @@ npm run seed -- --yes   # fictional demo claims; NOT for production projects
 
 ### 3. Gemini (optional)
 
-Set `GEMINI_API_KEY` to enable `POST /api/analyze` (admin-only, rate-limited).
-Its output is a risk signal for the editor, never a verdict.
+Set `GEMINI_API_KEY` to enable the AI features. `GEMINI_MODEL` (default
+`gemini-flash-latest`) and `GEMINI_TTS_MODEL` (default `gemini-3.8-flash-tts`)
+are optional overrides.
+
+- `POST /api/analyze` and the admin AI suggestions: admin-only, rate-limited.
+  Output is a proposal for the editor, never a verdict.
+- `POST /api/chat` (site chat widget) and `POST /api/tts` (read-aloud fallback
+  for Georgian/Armenian): **public**, per-IP rate-limited and length-capped.
+  They spend your Gemini quota, so watch usage.
+
+## Admin access
+
+### How to sign in
+
+1. Open **`/admin/login`** (opening `/admin` while signed out redirects there).
+2. Either enter your email and password, or click **Sign in with Google**.
+3. You land on **`/admin`**. If the account is not an admin you are signed out
+   and see "This account does not have admin access".
+
+Being signed in is not enough: the role comes from the `public.admin_users`
+table, checked in middleware, in the Google callback and again in every API route.
+
+### Admin URLs
+
+| Path | What |
+|---|---|
+| `/admin/login` | sign-in (email + password, Google) |
+| `/admin` | dashboard: Queue (with AI suggestions), Published, Rejected, Analytics |
+| `/auth/callback` | Google OAuth return URL (not opened by hand) |
+| `GET /api/admin/me` | who am I (used by login) |
+| `GET /api/admin/claims` | all claims, every state |
+| `POST /api/admin/claims/[id]` | `publish` / `reject` / `restore` |
+| `POST /api/admin/claims/[id]/suggest` | ask the AI for a suggestion |
+| `GET /api/admin/suggestions` | open AI suggestions |
+| `POST /api/admin/suggestions/[id]` | `approve` / `edit` / `reject` a suggestion |
+| `POST /api/analyze` | Gemini risk signal |
+
+Every action above is written to `public.audit_log`.
+
+### Creating an admin
+
+Email + password:
+1. Supabase dashboard → Authentication → Users → **Add user** (auto-confirm).
+2. Run `supabase/create_admin.example.sql` with that email.
+
+Google:
+1. Supabase → Authentication → Sign In / Providers → **Google**: enable it and
+   paste a Google OAuth client ID and secret (Google Cloud Console → APIs &
+   Services → Credentials → OAuth client, type *Web application*; add the
+   Authorized redirect URI shown in the Supabase Google provider panel,
+   `https://<project-ref>.supabase.co/auth/v1/callback`).
+2. Supabase → Authentication → URL Configuration: add
+   `http://localhost:3000/auth/callback` and your production
+   `https://<your-domain>/auth/callback` to **Redirect URLs**.
+3. The person clicks **Sign in with Google** once. They are refused (they are
+   not an admin yet), but Supabase has now created their user.
+4. Grant the role with `supabase/create_admin.example.sql` using their Google
+   email. They can now sign in with Google.
+
+Revoke access with `delete from public.admin_users where email = '...';`.
+To stop strangers creating accounts at all, disable "Allow new users to sign
+up" after the admins exist (existing users can still sign in).
 
 ## Scripts
 
@@ -58,6 +118,7 @@ Its output is a risk signal for the editor, never a verdict.
 | `npm run lint` | ESLint (flat config, `next/core-web-vitals`) |
 | `npm run typecheck` | `tsc --noEmit` |
 | `npm run seed -- --yes` | load demo claims (needs Node >= 22.18) |
+| `npm run pack:extension` | rebuild `public/trustlab-extension.zip` from `extension/` |
 
 CI (`.github/workflows/ci.yml`) runs install, lint, typecheck and build.
 

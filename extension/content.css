@@ -1,0 +1,14 @@
+.trustlab-badge {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 3px 10px;
+  border: 1px solid;
+  border-radius: 999px;
+  font: 600 12px/1.5 system-ui, sans-serif;
+  text-decoration: none !important;
+  cursor: pointer;
+}
+.trustlab-badge.tl-true { background: #e6f8f1; color: #047857; border-color: #10b981; }
+.trustlab-badge.tl-fake { background: #fef0f0; color: #b91c1c; border-color: #ef4444; }
+.trustlab-badge.tl-manip { background: #fef4e0; color: #92400e; border-color: #92400e; }
+.trustlab-badge:hover { filter: brightness(0.95); }

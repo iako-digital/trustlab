@@ -15,6 +15,7 @@ import {
   Award,
   Home,
 } from "lucide-react";
+import { SmartReader } from "@/components/common/smart-reader";
 import { Card } from "@/components/ui/card";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { useT } from "@/lib/i18n";
@@ -146,7 +147,7 @@ export function QuizApp() {
             key={i}
             className={cn(
               "h-1.5 flex-1 rounded-full transition-smooth",
-              i < index ? "bg-brand" : i === index ? "bg-ink" : "bg-paper-line",
+              i < index ? "bg-accent" : i === index ? "bg-ink" : "bg-paper-line",
             )}
           />
         ))}
@@ -156,6 +157,16 @@ export function QuizApp() {
         <h2 className="font-serif text-lg font-semibold leading-snug text-ink sm:text-xl">
           {t(`quiz.${question.id}prompt`)}
         </h2>
+
+        <SmartReader
+          compact
+          className="mt-3"
+          text={[
+            t(`quiz.${question.id}prompt`),
+            `A. ${t(`quiz.${question.id}optionA`)}`,
+            `B. ${t(`quiz.${question.id}optionB`)}`,
+          ].join(" ")}
+        />
 
         {question.visual ? (
           <VisualOptions
@@ -185,7 +196,7 @@ export function QuizApp() {
             <p
               className={cn(
                 "flex items-center gap-1.5 font-mono text-xs font-semibold uppercase tracking-[0.12em]",
-                selected === question.correct ? "text-verdict-true" : "text-verdict-fake",
+                selected === question.correct ? "text-verdict-trueink" : "text-verdict-fakeink",
               )}
             >
               {selected === question.correct ? (
@@ -198,6 +209,11 @@ export function QuizApp() {
             <p className="mt-2 text-sm leading-relaxed text-ink">
               {t(`quiz.${question.id}explanation`)}
             </p>
+            <SmartReader
+              compact
+              className="mt-3 flex"
+              text={`${selected === question.correct ? t("quiz.correct") : t("quiz.incorrect")} ${t(`quiz.${question.id}explanation`)}`}
+            />
             <Button variant="brand" size="sm" className="mt-4" onClick={goNext}>
               {index + 1 < total ? t("quiz.next") : t("quiz.seeResults")}
               <ArrowRight className="h-3.5 w-3.5" />
@@ -258,10 +274,10 @@ function TextOptions({
           </span>
           <span className="flex-1">{t(`quiz.${questionId}option${cap(opt)}`)}</span>
           {revealed && opt === correct && (
-            <CircleCheck className="h-4 w-4 shrink-0 text-verdict-true" />
+            <CircleCheck className="h-4 w-4 shrink-0 text-verdict-trueink" />
           )}
           {revealed && selected === opt && opt !== correct && (
-            <CircleX className="h-4 w-4 shrink-0 text-verdict-fake" />
+            <CircleX className="h-4 w-4 shrink-0 text-verdict-fakeink" />
           )}
         </button>
       ))}
@@ -328,9 +344,9 @@ function VisualOptions({
                 {t(`quiz.${questionId}option${cap(id)}`)}
               </p>
             </div>
-            {revealed && id === correct && <CircleCheck className="h-4 w-4 shrink-0 text-verdict-true" />}
+            {revealed && id === correct && <CircleCheck className="h-4 w-4 shrink-0 text-verdict-trueink" />}
             {revealed && selected === id && id !== correct && (
-              <CircleX className="h-4 w-4 shrink-0 text-verdict-fake" />
+              <CircleX className="h-4 w-4 shrink-0 text-verdict-fakeink" />
             )}
           </div>
         </button>

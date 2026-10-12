@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { ArrowLeft, ExternalLink } from "lucide-react";
+import { SmartReader } from "@/components/common/smart-reader";
 import { VerdictBadge } from "@/components/verdict-badge";
 import { useI18n } from "@/lib/i18n";
 import { useStore } from "@/lib/store";
@@ -31,6 +32,17 @@ export default function ClaimDetailPage() {
     );
   }
 
+  const explanationText =
+    claim.status !== "pending" ? claim.explanation[locale] || claim.explanation[claim.sourceLang] || "" : "";
+  const readText = [
+    `${t(`status.${claim.status}`)}.`,
+    claim.title[locale],
+    claim.claim[locale],
+    explanationText,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
     <article className="container max-w-3xl py-8 sm:py-12">
       <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-brand hover:gap-2">
@@ -57,6 +69,8 @@ export default function ClaimDetailPage() {
       <h1 className="mt-4 font-serif text-3xl font-semibold leading-tight text-ink sm:text-4xl">
         {claim.title[locale]}
       </h1>
+
+      <SmartReader className="mt-5" text={readText} />
 
       {/* The claim */}
       <section className="mt-8">

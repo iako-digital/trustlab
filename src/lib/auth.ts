@@ -16,19 +16,24 @@ export interface AdminIdentity {
  */
 export async function getAdmin(): Promise<AdminIdentity | null> {
   if (!isSupabaseConfigured()) return null;
-  const supabase = await createServerSupabase();
-  const { data: userData } = await supabase.auth.getUser();
-  const user = userData.user;
-  if (!user) return null;
+  try {
+    const supabase = await createServerSupabase();
+    const { data: userData } = await supabase.auth.getUser();
+    const user = userData.user;
+    if (!user) return null;
 
-  const { data: row } = await supabase
-    .from("admin_users")
-    .select("email, display_name, role")
-    .eq("user_id", user.id)
-    .maybeSingle();
-  if (!row || row.role !== "admin") return null;
+    const { data: row } = await supabase
+      .from("admin_users")
+      .select("email, display_name, role")
+      .eq("user_id", user.id)
+      .maybeSingle();
+    if (!row || row.role !== "admin") return null;
 
-  return { userId: user.id, email: row.email, displayName: row.display_name };
+    return { userId: user.id, email: row.email, displayName: row.display_name };
+  } catch {
+    // Treat any auth backend failure as "not an admin" (callers answer 401).
+    return null;
+  }
 }
 
 /** For route handlers: `const a = await requireAdmin(); if (a instanceof NextResponse) return a;` */

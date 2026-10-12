@@ -137,10 +137,17 @@
     "aiIncomplete": "Fill in all three titles and the explanation in the source language (use Edit) before approving.",
     "aiBusy": "Working…",
     "aiRateLimited": "Too many requests. Try again shortly.",
-    "aiNotConfigured": "AI is not configured on the server."
+    "aiNotConfigured": "AI is not configured on the server.",
+    "google": "Sign in with Google",
+    "or": "or",
+    "oauthError": "Google sign-in failed. Please try again."
   },
   "common": {
-    "language": { "ka": "ქართული", "hy": "Հայերեն", "en": "English" }
+    "language": {
+      "ka": "ქართული",
+      "hy": "Հայերեն",
+      "en": "English"
+    }
   },
   "quizBanner": {
     "eyebrow": "Test yourself",
@@ -200,11 +207,16 @@
     "mockPostFlagged": "Flagged as false",
     "mockFacebookUser": "Regional News Today",
     "mockTelegramChannel": "Caucasus Updates",
-    "install": "Install Extension",
-    "comingSoon": "Coming soon",
-    "modalTitle": "Install TrustLab Extension",
-    "modalBody": "The extension is currently in private beta for Chrome and Firefox. Leave your email on the Submit page or follow our channels to get notified at launch.",
-    "modalClose": "Close"
+    "install": "Download extension",
+    "comingSoon": "Chrome · Manifest V3",
+    "modalTitle": "Install the TrustLab extension",
+    "modalBody": "Download the zip, then load it in Chrome, Edge or Brave:",
+    "modalClose": "Close",
+    "modalStep1": "Unzip the downloaded file.",
+    "modalStep2": "Open chrome://extensions and turn on Developer mode.",
+    "modalStep3": "Click “Load unpacked” and choose the unzipped folder.",
+    "modalStep4": "Open the extension popup and set the TrustLab site address.",
+    "modalDownload": "Download zip"
   },
   "bot": {
     "eyebrow": "Fact-Check Bot",
@@ -223,5 +235,30 @@
     "modalTitle": "Chat with TrustLabBot",
     "modalBody": "The bot is currently in private beta. Leave your email on the Submit page or follow our channels to get notified at launch.",
     "modalClose": "Close"
+  },
+  "reader": {
+    "group": "Read aloud",
+    "listen": "Read aloud",
+    "pause": "Pause",
+    "resume": "Resume",
+    "stop": "Stop",
+    "progress": "Reading progress",
+    "loading": "Preparing audio",
+    "playing": "Reading",
+    "paused": "Paused",
+    "unavailable": "Audio is not available right now."
+  },
+  "chat": {
+    "title": "TrustLab assistant",
+    "subtitle": "Fact-checking and TrustLab help",
+    "welcome": "Hi! I can help you check claims and find your way around TrustLab. Ask me in Georgian, Armenian or English.",
+    "placeholder": "Ask about fact-checking…",
+    "send": "Send",
+    "open": "Open assistant chat",
+    "close": "Close chat",
+    "thinking": "Typing…",
+    "error": "The assistant is unavailable right now. Please try again.",
+    "rateLimited": "Too many messages. Please wait a moment.",
+    "notConfigured": "The assistant is not configured yet."
   }
 }

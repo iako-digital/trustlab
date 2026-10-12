@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
+    "pack:extension": "node scripts/pack-extension.mjs",
     "seed": "node --env-file=.env.local scripts/seed.mjs"
   },
   "dependencies": {

@@ -10,19 +10,19 @@ const STYLES: Record<
   { wrap: string; icon: typeof CircleCheck }
 > = {
   fake: {
-    wrap: "border-verdict-fake/40 bg-verdict-fakebg text-verdict-fake shadow-[0_8px_24px_rgba(193,39,45,0.08)]",
+    wrap: "border-verdict-fake/40 bg-verdict-fakebg text-verdict-fakeink shadow-[0_8px_24px_rgba(239,68,68,0.14)]",
     icon: CircleSlash,
   },
   manipulative: {
-    wrap: "border-verdict-manip/40 bg-verdict-manipbg text-verdict-manip shadow-[0_8px_24px_rgba(183,121,31,0.08)]",
+    wrap: "border-verdict-manip/40 bg-verdict-manipbg text-verdict-manipink shadow-[0_8px_24px_rgba(217,119,6,0.14)]",
     icon: TriangleAlert,
   },
   true: {
-    wrap: "border-verdict-true/40 bg-verdict-truebg text-verdict-true shadow-[0_8px_24px_rgba(46,125,91,0.08)]",
+    wrap: "border-verdict-true/40 bg-verdict-truebg text-verdict-trueink shadow-[0_8px_24px_rgba(16,185,129,0.16)]",
     icon: CircleCheck,
   },
   pending: {
-    wrap: "border-verdict-pending/30 bg-verdict-pendingbg text-verdict-pending shadow-[0_8px_24px_rgba(75,92,116,0.06)]",
+    wrap: "border-verdict-pending/30 bg-verdict-pendingbg text-verdict-pending shadow-[0_8px_24px_rgba(71,85,105,0.10)]",
     icon: Clock,
   },
 };

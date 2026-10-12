@@ -22,7 +22,7 @@ export function Analytics({ claims: all }: { claims: Claim[] }) {
   return (
     <div className="grid gap-5 lg:grid-cols-3">
       <StatCard
-        icon={<CheckCircle2 className="h-5 w-5 text-verdict-true" />}
+        icon={<CheckCircle2 className="h-5 w-5 text-verdict-trueink" />}
         value={published.length}
         label={t("admin.statTotal")}
       />

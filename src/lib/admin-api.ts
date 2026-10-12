@@ -43,11 +43,13 @@ export function useAdminClaims() {
         fetch("/api/admin/claims", { cache: "no-store" }),
         fetch("/api/admin/suggestions", { cache: "no-store" }),
       ]);
-      if (!res.ok || !sres.ok) throw new Error(String(res.status));
+      if (!res.ok) throw new Error(String(res.status));
       const json = (await res.json()) as { claims: Claim[] };
-      const sjson = (await sres.json()) as { suggestions: AiSuggestion[] };
       setClaims(json.claims);
-      setSuggestions(sjson.suggestions);
+      // AI suggestions are optional: if that endpoint fails (e.g. migration 0003
+      // not applied yet) the queue must still work without them.
+      const sjson = sres.ok ? ((await sres.json()) as { suggestions: AiSuggestion[] }) : null;
+      setSuggestions(sjson?.suggestions ?? []);
       setLoadFailed(false);
     } catch {
       setLoadFailed(true);

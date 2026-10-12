@@ -125,7 +125,7 @@ export function ClaimEditor({
               </button>
             ))}
           </div>
-          {error === "verdict" && <p className="mt-1 text-xs text-verdict-fake">{t("submit.required")}</p>}
+          {error === "verdict" && <p className="mt-1 text-xs text-verdict-fakeink">{t("submit.required")}</p>}
         </div>
 
         <div className="grid gap-3 sm:grid-cols-3">
@@ -157,12 +157,12 @@ export function ClaimEditor({
         </div>
 
         {error === "content" && (
-          <p role="alert" className="text-xs text-verdict-fake">
+          <p role="alert" className="text-xs text-verdict-fakeink">
             {t("admin.needExplanation")}
           </p>
         )}
         {error === "request" && (
-          <p role="alert" className="text-xs text-verdict-fake">
+          <p role="alert" className="text-xs text-verdict-fakeink">
             {t("admin.actionError")}
           </p>
         )}
@@ -186,7 +186,7 @@ export function ClaimEditor({
                 size="sm"
                 onClick={reject}
                 disabled={busy || !reason.trim()}
-                className="text-verdict-fake"
+                className="text-verdict-fakeink"
               >
                 {t("admin.confirmReject")}
               </Button>
@@ -199,7 +199,7 @@ export function ClaimEditor({
               size="sm"
               onClick={() => setRejecting(true)}
               disabled={busy}
-              className="text-verdict-fake"
+              className="text-verdict-fakeink"
             >
               <Ban className="h-4 w-4" />
               {t("admin.reject")}

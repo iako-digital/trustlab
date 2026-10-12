@@ -1,7 +1,7 @@
 import "server-only";
 import { LOCALES, type Locale, type Verdict } from "@/lib/types";
 
-const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-flash-latest";
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 
 const SYSTEM_PROMPT = `You are an AI assistant for the fact-checking editors of "TrustLab", which debunks disinformation in the South Caucasus (Georgia and Armenia).

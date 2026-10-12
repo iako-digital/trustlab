@@ -88,7 +88,7 @@ export function AdminDashboard() {
       </div>
 
       {loadFailed && (
-        <p role="alert" className="mb-4 text-sm text-verdict-fake">
+        <p role="alert" className="mb-4 text-sm text-verdict-fakeink">
           {t("admin.loadError")}
         </p>
       )}
@@ -163,7 +163,7 @@ function RestoreButton({ onClick }: { onClick: () => Promise<boolean> }) {
   const [failed, setFailed] = useState(false);
   return (
     <div className="flex items-center gap-3">
-      {failed && <span className="text-xs text-verdict-fake">{t("admin.actionError")}</span>}
+      {failed && <span className="text-xs text-verdict-fakeink">{t("admin.actionError")}</span>}
       <Button
         variant="outline"
         size="sm"

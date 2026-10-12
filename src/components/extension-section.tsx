@@ -12,9 +12,12 @@ import {
   Chrome,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
 import { useT } from "@/lib/i18n";
+
+const EXTENSION_ZIP = "/trustlab-extension.zip";
+const STEPS = ["modalStep1", "modalStep2", "modalStep3", "modalStep4"] as const;
 
 const FEATURES = [
   { key: "feature1", icon: ScanEye },
@@ -65,9 +68,16 @@ export function ExtensionSection() {
             </ul>
 
             <div className="mt-6 flex flex-wrap items-center gap-3">
-              <Button variant="brand" onClick={() => setOpen(true)}>
+              <a
+                href={EXTENSION_ZIP}
+                download
+                className={buttonVariants({ variant: "brand" })}
+              >
                 <Download className="h-4 w-4" />
                 {t("extension.install")}
+              </a>
+              <Button variant="ghost" onClick={() => setOpen(true)}>
+                {t("extension.modalTitle")}
               </Button>
               <span className="inline-flex items-center gap-1.5 text-xs text-ink-faint">
                 <Chrome className="h-3.5 w-3.5" />
@@ -99,9 +109,20 @@ export function ExtensionSection() {
           {t("extension.modalTitle")}
         </h3>
         <p className="mt-2 text-sm leading-relaxed text-ink-soft">{t("extension.modalBody")}</p>
-        <Button variant="default" className="mt-5" onClick={() => setOpen(false)}>
-          {t("extension.modalClose")}
-        </Button>
+        <ol className="mt-3 list-decimal space-y-1.5 pl-5 text-sm leading-relaxed text-ink-soft">
+          {STEPS.map((k) => (
+            <li key={k}>{t(`extension.${k}`)}</li>
+          ))}
+        </ol>
+        <div className="mt-5 flex flex-wrap gap-3">
+          <a href={EXTENSION_ZIP} download className={buttonVariants({ variant: "brand" })}>
+            <Download className="h-4 w-4" />
+            {t("extension.modalDownload")}
+          </a>
+          <Button variant="default" onClick={() => setOpen(false)}>
+            {t("extension.modalClose")}
+          </Button>
+        </div>
       </Modal>
     </section>
   );
@@ -139,8 +160,8 @@ function MockPost({
         className={
           "absolute -right-2 -top-2 flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-medium shadow-card " +
           (good
-            ? "border-verdict-true/40 bg-verdict-truebg text-verdict-true"
-            : "border-verdict-fake/40 bg-verdict-fakebg text-verdict-fake")
+            ? "border-verdict-true/40 bg-verdict-truebg text-verdict-trueink"
+            : "border-verdict-fake/40 bg-verdict-fakebg text-verdict-fakeink")
         }
       >
         {good ? <CircleCheck className="h-3.5 w-3.5" /> : <CircleX className="h-3.5 w-3.5" />}

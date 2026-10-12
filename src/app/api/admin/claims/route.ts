@@ -10,6 +10,10 @@ export async function GET() {
   const admin = await requireAdmin();
   if (admin instanceof NextResponse) return admin;
 
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    return NextResponse.json({ error: "Server is not configured." }, { status: 503 });
+  }
+
   const { data, error } = await createServiceSupabase()
     .from("claims")
     .select(CLAIM_COLUMNS)

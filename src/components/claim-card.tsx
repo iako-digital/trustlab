@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ArrowRight, FileText, Link2, Image as ImageIcon } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { SmartReader } from "@/components/common/smart-reader";
 import { VerdictBadge } from "@/components/verdict-badge";
 import { useI18n } from "@/lib/i18n";
 import { formatDate } from "@/lib/utils";
@@ -35,6 +36,12 @@ export function ClaimCard({ claim }: { claim: Claim }) {
         <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-ink-soft">
           {claim.claim[locale]}
         </p>
+
+        <SmartReader
+          compact
+          className="mt-3 self-start"
+          text={`${t(`status.${claim.status}`)}. ${claim.title[locale]}. ${claim.claim[locale]}`}
+        />
 
         <div className="mt-4 flex items-center justify-between border-t border-paper-line pt-3">
           <span className="font-mono text-[11px] text-ink-faint">
