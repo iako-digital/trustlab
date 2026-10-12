@@ -7,6 +7,7 @@
   "permissions": ["storage"],
   "host_permissions": [
     "http://localhost:3000/*",
+    "https://trustlab-iota.vercel.app/*",
     "https://www.facebook.com/*",
     "https://web.telegram.org/*",
     "https://t.me/*"

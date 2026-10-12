@@ -3,7 +3,7 @@ const status = (msg) => ($("status").textContent = msg);
 
 chrome.storage.local.get(["baseUrl", "enabled"], (s) => {
   $("enabled").checked = s.enabled !== false;
-  $("baseUrl").value = s.baseUrl || "http://localhost:3000";
+  $("baseUrl").value = s.baseUrl || "https://trustlab-iota.vercel.app";
 });
 
 $("enabled").addEventListener("change", () => {
