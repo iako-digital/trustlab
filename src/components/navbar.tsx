@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Logo } from "@/components/logo";
 import { useT } from "@/lib/i18n";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { FacebookLink } from "@/components/facebook-link";
 
 export function Navbar() {
   const t = useT();
@@ -32,6 +33,7 @@ export function Navbar() {
           >
             {t("nav.submit")}
           </Link>
+          <FacebookLink className="ml-1" />
           <div className="ml-1">
             <LanguageSwitcher />
           </div>

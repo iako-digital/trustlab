@@ -274,5 +274,8 @@
     "notConfigured": "The assistant is not configured yet.",
     "quota": "The assistant has reached its daily limit. Please try again later.",
     "busy": "The assistant is very busy right now. Please try again in a moment."
+  },
+  "social": {
+    "facebook": "TrustLab on Facebook"
   }
 }
