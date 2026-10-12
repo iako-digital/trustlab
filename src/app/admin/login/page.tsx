@@ -70,6 +70,7 @@ export default function AdminLoginPage() {
             type="email"
             autoComplete="username"
             required
+            placeholder="sunovibe.it@gmail.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
