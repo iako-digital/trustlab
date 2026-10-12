@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { requireAdmin } from "@/lib/auth";
 import { createServiceSupabase } from "@/lib/supabase/server";
 import { rateLimit } from "@/lib/rate-limit";
-import { parsePublish, parseReason } from "@/lib/validation";
+import { parseClaimInput, parsePublish, parseReason } from "@/lib/validation";
 import type { Locale } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -83,4 +83,57 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
   }
 
   return NextResponse.json({ ok: true, state: (data as { state: string }).state });
+}
+
+async function gate(ctx: { params: Promise<{ id: string }> }) {
+  const admin = await requireAdmin();
+  if (admin instanceof NextResponse) return { res: admin } as const;
+  const { id } = await ctx.params;
+  if (!UUID.test(id)) return { res: NextResponse.json({ error: "Invalid id." }, { status: 400 }) } as const;
+  if (!rateLimit(`admin-action:${admin.userId}`, 60, 60 * 1000).ok) {
+    return { res: NextResponse.json({ error: "Too many requests." }, { status: 429 }) } as const;
+  }
+  return { admin, id } as const;
+}
+
+function rpcError(error: { code?: string; message?: string }, what: string) {
+  if (error.code === "P0002") return NextResponse.json({ error: "Claim not found." }, { status: 404 });
+  const code = error.code === "42883" || error.code === "PGRST202" ? "migration_missing" : undefined;
+  return NextResponse.json({ error: `Could not ${what} claim.`, code }, { status: 500 });
+}
+
+/** Admin: edit a claim's content (not its lifecycle state). */
+export async function PUT(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
+  const g = await gate(ctx);
+  if ("res" in g) return g.res;
+
+  let body: unknown;
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: "Request body must be JSON." }, { status: 400 });
+  }
+  const parsed = parseClaimInput(body);
+  if (!parsed.ok) return NextResponse.json({ error: `Invalid field: ${parsed.error}` }, { status: 400 });
+
+  const { error } = await createServiceSupabase().rpc("admin_edit_claim", {
+    p_id: g.id,
+    p_data: parsed.value,
+    p_actor: g.admin.userId,
+  });
+  if (error) return rpcError(error, "update");
+  return NextResponse.json({ ok: true });
+}
+
+/** Admin: delete a claim for good (the full row is kept in audit_log). */
+export async function DELETE(_req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
+  const g = await gate(ctx);
+  if ("res" in g) return g.res;
+
+  const { error } = await createServiceSupabase().rpc("admin_delete_claim", {
+    p_id: g.id,
+    p_actor: g.admin.userId,
+  });
+  if (error) return rpcError(error, "delete");
+  return NextResponse.json({ ok: true });
 }

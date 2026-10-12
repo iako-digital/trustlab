@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { LogOut } from "lucide-react";
+import { LogOut, Pencil, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Modal } from "@/components/ui/modal";
+import { ClaimForm } from "@/components/admin/claim-form";
 import { Analytics } from "@/components/admin/analytics";
 import { ClaimEditor } from "@/components/admin/editor";
 import { AiSuggestionPanel } from "@/components/admin/ai-suggestion-panel";
@@ -12,6 +14,7 @@ import { useAdminClaims } from "@/lib/admin-api";
 import { useI18n } from "@/lib/i18n";
 import { createBrowserSupabase } from "@/lib/supabase/browser";
 import { cn } from "@/lib/utils";
+import type { Claim } from "@/lib/types";
 
 type Tab = "pending" | "published" | "rejected" | "analytics";
 
@@ -22,7 +25,22 @@ type Tab = "pending" | "published" | "rejected" | "analytics";
 export function AdminDashboard() {
   const { t, locale } = useI18n();
   const router = useRouter();
-  const { claims, suggestions, loading, loadFailed, act, decide, generate } = useAdminClaims();
+  const {
+    claims,
+    suggestions,
+    loading,
+    loadFailed,
+    act,
+    decide,
+    generate,
+    createClaim,
+    editClaim,
+    removeClaim,
+  } = useAdminClaims();
+  const [form, setForm] = useState<{ claim?: Claim } | null>(null);
+  const [deleting, setDeleting] = useState<Claim | null>(null);
+  const [deleteBusy, setDeleteBusy] = useState(false);
+  const [deleteFailed, setDeleteFailed] = useState(false);
   const [tab, setTab] = useState<Tab>("pending");
   const [me, setMe] = useState<string | null>(null);
 
@@ -58,10 +76,16 @@ export function AdminDashboard() {
           <p className="mt-1 text-ink-soft">{t("admin.subtitle")}</p>
           {me && <p className="mt-1 font-mono text-[11px] text-ink-faint">{me}</p>}
         </div>
-        <Button variant="outline" size="sm" onClick={logout}>
-          <LogOut className="h-4 w-4" />
-          {t("admin.logout")}
-        </Button>
+        <div className="flex flex-wrap justify-end gap-2">
+          <Button variant="brand" size="sm" onClick={() => setForm({})}>
+            <Plus className="h-4 w-4" />
+            {t("admin.newClaim")}
+          </Button>
+          <Button variant="outline" size="sm" onClick={logout}>
+            <LogOut className="h-4 w-4" />
+            {t("admin.logout")}
+          </Button>
+        </div>
       </div>
 
       {/* Tabs */}
@@ -124,7 +148,27 @@ export function AdminDashboard() {
         ) : (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {published.map((c) => (
-              <ClaimCard key={c.id} claim={c} />
+              <div key={c.id} className="flex flex-col gap-2">
+                <ClaimCard claim={c} />
+                <div className="flex justify-end gap-2">
+                  <Button variant="outline" size="sm" onClick={() => setForm({ claim: c })}>
+                    <Pencil className="h-4 w-4" />
+                    {t("admin.edit")}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-verdict-fakeink"
+                    onClick={() => {
+                      setDeleteFailed(false);
+                      setDeleting(c);
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    {t("admin.delete")}
+                  </Button>
+                </div>
+              </div>
             ))}
           </div>
         ))}
@@ -146,13 +190,75 @@ export function AdminDashboard() {
                     {t("admin.rejectedWhy", { reason: c.rejectReason })}
                   </p>
                 )}
-                <div className="mt-4 flex justify-end">
+                <div className="mt-4 flex items-center justify-end gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-verdict-fakeink"
+                    onClick={() => {
+                      setDeleteFailed(false);
+                      setDeleting(c);
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    {t("admin.delete")}
+                  </Button>
                   <RestoreButton onClick={() => act(c.id, { action: "restore" })} />
                 </div>
               </div>
             ))}
           </div>
         ))}
+
+      <Modal
+        open={form !== null}
+        onClose={() => setForm(null)}
+        title={form?.claim ? t("admin.editClaim") : t("admin.newClaim")}
+        className="max-h-[90vh] max-w-2xl overflow-y-auto"
+      >
+        {form && (
+          <ClaimForm
+            claim={form.claim}
+            onCancel={() => setForm(null)}
+            onSubmit={async (v) => {
+              const res = form.claim ? await editClaim(form.claim.id, v) : await createClaim(v);
+              if (res.ok) setForm(null);
+              return res;
+            }}
+          />
+        )}
+      </Modal>
+
+      <Modal open={deleting !== null} onClose={() => setDeleting(null)} title={t("admin.delete")}>
+        <h3 className="pr-6 font-serif text-lg font-semibold text-ink">{t("admin.delete")}</h3>
+        <p className="mt-2 text-sm leading-relaxed text-ink-soft">
+          {t("admin.deleteConfirm", { title: deleting?.title[locale] ?? "" })}
+        </p>
+        {deleteFailed && (
+          <p role="alert" className="mt-2 text-xs text-verdict-fakeink">
+            {t("admin.actionError")}
+          </p>
+        )}
+        <div className="mt-5 flex justify-end gap-2">
+          <Button variant="ghost" onClick={() => setDeleting(null)} disabled={deleteBusy}>
+            {t("admin.cancel")}
+          </Button>
+          <Button
+            variant="danger"
+            disabled={deleteBusy}
+            onClick={async () => {
+              if (!deleting) return;
+              setDeleteBusy(true);
+              const res = await removeClaim(deleting.id);
+              setDeleteBusy(false);
+              if (res.ok) setDeleting(null);
+              else setDeleteFailed(true);
+            }}
+          >
+            {t("admin.delete")}
+          </Button>
+        </div>
+      </Modal>
     </div>
   );
 }

@@ -137,7 +137,22 @@
     "aiIncomplete": "Fill in all three titles and the explanation in the source language (use Edit) before approving.",
     "aiBusy": "Working…",
     "aiRateLimited": "Too many requests. Try again shortly.",
-    "aiNotConfigured": "AI is not configured on the server."
+    "aiNotConfigured": "AI is not configured on the server.",
+    "newClaim": "New claim",
+    "editClaim": "Edit claim",
+    "edit": "Edit",
+    "delete": "Delete",
+    "save": "Save",
+    "deleteConfirm": "Delete “{title}” permanently? The full record is kept in the audit log.",
+    "saveAsPending": "Save as pending (no verdict)",
+    "fieldTitle": "Title",
+    "fieldClaim": "The claim",
+    "fieldExplanation": "Explanation / evidence",
+    "fieldSourceUrl": "Original post URL (optional)",
+    "tags": "Tags",
+    "tagsHelp": "comma separated, e.g. history, viral-video",
+    "formInvalid": "Some fields are invalid or missing: all three titles and claims are required, and a verdict needs an explanation in the source language.",
+    "migrationMissing": "The database is missing migration 0004 (supabase/migrations/0004_claim_crud_and_tags.sql). Run it in the Supabase SQL editor."
   },
   "common": {
     "language": {

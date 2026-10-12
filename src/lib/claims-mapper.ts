@@ -13,6 +13,7 @@ export interface ClaimRow {
   submission_type: Claim["submissionType"];
   source_url: string | null;
   sources: string[];
+  tags?: string[] | null;
   verified_label: string | null;
   verified_at: string | null;
   reject_reason: string | null;
@@ -34,6 +35,7 @@ export function rowToClaim(r: ClaimRow, opts: { admin?: boolean } = {}): Claim {
     submissionType: r.submission_type,
     sourceUrl: r.source_url ?? undefined,
     sources: r.sources ?? [],
+    tags: r.tags ?? [],
     verifiedBy: r.verifier?.display_name ?? r.verified_label ?? undefined,
     submittedAt: r.submitted_at,
     verifiedAt: r.verified_at ?? undefined,
@@ -50,5 +52,9 @@ export function rowToClaim(r: ClaimRow, opts: { admin?: boolean } = {}): Claim {
  * cannot see it; the public API therefore uses the service client for the join
  * and exposes only the display name.
  */
-export const CLAIM_COLUMNS =
+const BASE_COLUMNS =
   "id,title,claim,explanation,state,verdict,category,source_lang,submission_type,source_url,sources,verified_label,verified_at,reject_reason,rejected_at,submitted_at,verifier:admin_users!claims_verified_by_fkey(display_name)";
+
+export const CLAIM_COLUMNS = BASE_COLUMNS;
+/** Includes `tags` (migration 0004). Use loadClaimRows() so older databases keep working. */
+export const CLAIM_COLUMNS_WITH_TAGS = BASE_COLUMNS.replace(",sources,",",sources,tags,");

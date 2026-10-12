@@ -1,6 +1,6 @@
 // Loads the illustrative demo claims from src/data/claims.ts into Supabase.
-// Idempotent (upsert on seed_key). These claims are fictional demo content:
-// do NOT run this against a production project.
+// Idempotent (upsert on seed_key). These claims are fictional demo content
+// (tagged "demo"): do NOT run this against a production project.
 //
 // Usage:  npm run seed -- --yes
 // Needs:  NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in .env.local
@@ -37,13 +37,25 @@ const rows = SEED_CLAIMS.map((c) => {
     submission_type: c.submissionType,
     source_url: c.sourceUrl ?? null,
     sources: c.sources,
+    tags: c.tags ?? [],
     verified_label: c.verifiedBy ?? null,
     verified_at: c.verifiedAt ?? null,
     submitted_at: c.submittedAt,
   };
 });
 
-const { error } = await supabase.from("claims").upsert(rows, { onConflict: "seed_key" });
+let { error } = await supabase.from("claims").upsert(rows, { onConflict: "seed_key" });
+if (error?.code === "PGRST204" || error?.code === "42703") {
+  // `tags` column missing: migration 0004 has not been applied. Seed without tags.
+  console.warn("Column claims.tags not found (run migration 0004 for tags); seeding without tags.");
+  ({ error } = await supabase
+    .from("claims")
+    .upsert(rows.map((r) => {
+      const copy = { ...r };
+      delete copy.tags;
+      return copy;
+    }), { onConflict: "seed_key" }));
+}
 if (error) {
   console.error("Seed failed:", error.message);
   process.exit(1);

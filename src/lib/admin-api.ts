@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import type { AiSuggestion, Claim, Locale, Verdict } from "@/lib/types";
+import type { AiSuggestion, Category, Claim, Locale, Verdict } from "@/lib/types";
 
 export type AdminAction =
   | {
@@ -27,7 +27,20 @@ export type SuggestionDecision =
 /** `code` carries the server's reason when it is one the UI explains. */
 export interface ActResult {
   ok: boolean;
-  code?: "incomplete" | "not_configured" | "rate_limited";
+  code?: "incomplete" | "not_configured" | "rate_limited" | "invalid" | "migration_missing";
+}
+
+/** What the create/edit form sends. `verdict: null` saves (or keeps) the claim as pending. */
+export interface ClaimFormValue {
+  title: Record<Locale, string>;
+  claim: Record<Locale, string>;
+  explanation: Record<Locale, string>;
+  category: Category;
+  sourceLang: Locale;
+  sourceUrl: string;
+  sources: string[];
+  tags: string[];
+  verdict: Verdict | null;
 }
 
 /** Loads every claim (all states) for the admin UI and performs admin actions. */
@@ -81,10 +94,10 @@ export function useAdminClaims() {
   );
 
   const post = useCallback(
-    async (url: string, body?: unknown): Promise<ActResult> => {
+    async (url: string, body?: unknown, method = "POST"): Promise<ActResult> => {
       try {
         const res = await fetch(url, {
-          method: "POST",
+          method,
           headers: { "Content-Type": "application/json" },
           body: body === undefined ? undefined : JSON.stringify(body),
         });
@@ -94,7 +107,10 @@ export function useAdminClaims() {
         }
         const j = (await res.json().catch(() => ({}))) as { code?: string };
         if (res.status === 429) return { ok: false, code: "rate_limited" };
-        if (j.code === "incomplete" || j.code === "not_configured") return { ok: false, code: j.code };
+        if (res.status === 400) return { ok: false, code: "invalid" };
+        if (j.code === "incomplete" || j.code === "not_configured" || j.code === "migration_missing") {
+          return { ok: false, code: j.code };
+        }
         return { ok: false };
       } catch {
         return { ok: false };
@@ -112,5 +128,27 @@ export function useAdminClaims() {
     [post],
   );
 
-  return { claims, suggestions, loading, loadFailed, refresh, act, decide, generate };
+  const createClaim = useCallback((v: ClaimFormValue) => post("/api/admin/claims", v), [post]);
+  const editClaim = useCallback(
+    (id: string, v: ClaimFormValue) => post(`/api/admin/claims/${id}`, v, "PUT"),
+    [post],
+  );
+  const removeClaim = useCallback(
+    (id: string) => post(`/api/admin/claims/${id}`, undefined, "DELETE"),
+    [post],
+  );
+
+  return {
+    claims,
+    suggestions,
+    loading,
+    loadFailed,
+    refresh,
+    act,
+    decide,
+    generate,
+    createClaim,
+    editClaim,
+    removeClaim,
+  };
 }

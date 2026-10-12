@@ -70,6 +70,19 @@ export default function ClaimDetailPage() {
         {claim.title[locale]}
       </h1>
 
+      {claim.tags && claim.tags.length > 0 && (
+        <ul className="mt-4 flex flex-wrap gap-1.5" aria-label="tags">
+          {claim.tags.map((tag) => (
+            <li
+              key={tag}
+              className="rounded-full border border-paper-line bg-paper-tint px-2 py-0.5 font-mono text-[10px] text-ink-soft"
+            >
+              #{tag}
+            </li>
+          ))}
+        </ul>
+      )}
+
       <SmartReader className="mt-5" text={readText} />
 
       {/* The claim */}

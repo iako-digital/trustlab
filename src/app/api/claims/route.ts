@@ -1,7 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServiceSupabase } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
-import { CLAIM_COLUMNS, rowToClaim, type ClaimRow } from "@/lib/claims-mapper";
+import { rowToClaim } from "@/lib/claims-mapper";
+import { loadClaimRows } from "@/lib/claims-query";
 import { clientIp, rateLimit } from "@/lib/rate-limit";
 import { parseSubmission } from "@/lib/validation";
 
@@ -15,18 +16,15 @@ export async function GET() {
 
   // Service client is used only for the verifier-name join; the state filter
   // is explicit and rejection details are never mapped for the public.
-  const { data, error } = await createServiceSupabase()
-    .from("claims")
-    .select(CLAIM_COLUMNS)
-    .eq("state", "published")
-    .order("verified_at", { ascending: false })
-    .limit(500)
-    .returns<ClaimRow[]>();
-
-  if (error) return NextResponse.json({ error: "Could not load claims." }, { status: 500 });
+  const { rows, failed } = await loadClaimRows(createServiceSupabase(), {
+    publishedOnly: true,
+    limit: 500,
+    orderBy: "verified_at",
+  });
+  if (failed || !rows) return NextResponse.json({ error: "Could not load claims." }, { status: 500 });
 
   return NextResponse.json(
-    { claims: data.map((r) => rowToClaim(r)) },
+    { claims: rows.map((r) => rowToClaim(r)) },
     { headers: { "Cache-Control": "public, s-maxage=30, stale-while-revalidate=120" } },
   );
 }

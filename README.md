@@ -32,7 +32,7 @@ npm run dev                  # http://localhost:3000
 
 1. Create a project at https://supabase.com.
 2. SQL editor: run `supabase/migrations/0001_schema.sql`, then
-   `0002_admin_claim_actions.sql`, then `0003_ai_suggestions.sql` (or use the Supabase CLI: `supabase db push`).
+   `0002_admin_claim_actions.sql`, then `0003_ai_suggestions.sql` and `0004_claim_crud_and_tags.sql` (or use the Supabase CLI: `supabase db push`).
 3. Authentication → Users → **Add user** (email + password, auto-confirm).
 4. Make that user an admin: adapt and run `supabase/create_admin.example.sql`.
 5. Project Settings → API: copy the URL, `anon` key and `service_role` key
@@ -42,7 +42,7 @@ npm run dev                  # http://localhost:3000
 ### 2. Optional demo data
 
 ```bash
-npm run seed -- --yes   # fictional demo claims; NOT for production projects
+npm run seed -- --yes   # 9 published + 2 pending demo claims (ka/hy/en, tagged "demo"); NOT for production projects
 ```
 
 ### 3. Gemini (optional)
@@ -77,6 +77,9 @@ table, checked in middleware and again in every API route.
 | `/admin` | dashboard: Queue (with AI suggestions), Published, Rejected, Analytics |
 | `GET /api/admin/me` | who am I (used by login) |
 | `GET /api/admin/claims` | all claims, every state |
+| `POST /api/admin/claims` | create a claim (pending, or published when a verdict is given) |
+| `PUT /api/admin/claims/[id]` | edit a claim's content |
+| `DELETE /api/admin/claims/[id]` | delete a claim (full row kept in the audit log) |
 | `POST /api/admin/claims/[id]` | `publish` / `reject` / `restore` |
 | `POST /api/admin/claims/[id]/suggest` | ask the AI for a suggestion |
 | `GET /api/admin/suggestions` | open AI suggestions |
