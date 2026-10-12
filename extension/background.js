@@ -1,6 +1,8 @@
 // Service worker: fetches published claims from the TrustLab site and caches
 // them. Content scripts ask it for claims, so only this worker needs host access.
 
+importScripts("matcher.js");
+
 const DEFAULT_BASE = "https://trustlab-iota.vercel.app";
 const CACHE_MS = 10 * 60 * 1000;
 
@@ -54,4 +56,40 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
 // Re-sync when the site address or the toggle changes.
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area === "local" && (changes.baseUrl || changes.enabled)) chrome.storage.local.remove("cache");
+});
+
+// Right-click "Check with TrustLab" on selected text: match it against the
+// published claims, store the result for the popup and flag the toolbar icon.
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.contextMenus.create({
+    id: "trustlab-check",
+    title: "Check with TrustLab",
+    contexts: ["selection"],
+  });
+});
+
+chrome.contextMenus.onClicked.addListener(async (info) => {
+  if (info.menuItemId !== "trustlab-check") return;
+  const text = (info.selectionText || "").trim();
+  if (!text) return;
+  let check;
+  try {
+    const { baseUrl } = await getSettings();
+    const { buildIndex, findMatch } = self.TrustLabMatcher;
+    const match = findMatch(buildIndex(await loadClaims(false)), text);
+    check = {
+      text: text.slice(0, 300),
+      at: Date.now(),
+      baseUrl,
+      match: match ? { id: match.id, status: match.status, title: match.title } : null,
+    };
+  } catch (e) {
+    check = { text: text.slice(0, 300), at: Date.now(), error: String(e) };
+  }
+  await chrome.storage.local.set({ lastCheck: check });
+  chrome.action.setBadgeBackgroundColor({ color: check.error ? "#b91c1c" : check.match ? "#15803d" : "#6b7280" });
+  chrome.action.setBadgeText({ text: check.error ? "!" : check.match ? "✓" : "?" });
+  try {
+    await chrome.action.openPopup(); // needs a recent Chrome; the badge is the fallback
+  } catch {}
 });

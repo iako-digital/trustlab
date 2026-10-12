@@ -34,3 +34,27 @@ $("refresh").addEventListener("click", () => {
     status(res && res.ok ? `Loaded ${res.count} verified claims.` : "Could not reach the TrustLab site.");
   });
 });
+
+// Result of the last right-click "Check with TrustLab".
+chrome.storage.local.get("lastCheck", ({ lastCheck }) => {
+  chrome.action.setBadgeText({ text: "" });
+  if (!lastCheck) return;
+  const box = $("check");
+  const quote = document.createElement("blockquote");
+  quote.textContent = `“${lastCheck.text}”`;
+  const result = document.createElement("p");
+  box.append(quote, result);
+  if (lastCheck.error) {
+    result.textContent = "Could not reach the TrustLab site.";
+  } else if (lastCheck.match) {
+    const t = lastCheck.match.title || {};
+    const a = document.createElement("a");
+    a.href = `${lastCheck.baseUrl}/claim/${lastCheck.match.id}`;
+    a.target = "_blank";
+    a.textContent = t.en || t.ka || t.hy || "View fact-check";
+    result.append(`Match (${lastCheck.match.status}): `, a);
+  } else {
+    result.textContent = "No matching fact-check found.";
+  }
+  box.hidden = false;
+});
