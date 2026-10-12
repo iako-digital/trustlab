@@ -4,11 +4,21 @@ import { SUPABASE_ANON_KEY, SUPABASE_URL, isSupabaseConfigured } from "@/lib/sup
 
 /**
  * Server-side gate for everything admin: /admin/*, /api/admin/*, /api/analyze.
+ * Also redirects locale-prefixed URLs (/ka/..., /hy/..., /en/...) to the unprefixed route.
  * Also refreshes the Supabase session cookie. Route handlers re-check the
  * role themselves (requireAdmin) — this is defense in depth, not the only door.
  */
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // The app has no locale-prefixed routes (language is chosen in the UI), but
+  // links like /ka/admin/login are common. Send them to the real path.
+  const localized = /^\/(?:ka|hy|en)(\/.*)?$/.exec(pathname);
+  if (localized) {
+    const url = request.nextUrl.clone();
+    url.pathname = localized[1] || "/";
+    return NextResponse.redirect(url, 308);
+  }
   const isApi = pathname.startsWith("/api/");
   const isLoginPage = pathname === "/admin/login";
 
@@ -63,5 +73,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/api/admin/:path*", "/api/analyze"],
+  matcher: ["/(ka|hy|en)", "/(ka|hy|en)/:path*", "/admin/:path*", "/api/admin/:path*", "/api/analyze"],
 };
