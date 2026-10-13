@@ -282,8 +282,7 @@
     "progress": "Reading progress",
     "loading": "Preparing audio",
     "playing": "Reading",
-    "paused": "Paused",
-    "unavailable": "Audio is not available right now."
+    "paused": "Paused"
   },
   "chat": {
     "title": "TrustLab assistant",

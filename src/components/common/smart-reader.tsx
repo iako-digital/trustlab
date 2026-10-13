@@ -9,12 +9,10 @@ import type { Locale } from "@/lib/types";
 
 const BCP47: Record<Locale, string> = { ka: "ka-GE", hy: "hy-AM", en: "en-US" };
 const NATIVE_CHUNK = 200; // Chrome silently stops long utterances; speak sentence-sized pieces.
-const SERVER_CHUNK = 1000; // /api/tts accepts up to 1200 characters.
-const SERVER_MAX_CHUNKS = 4;
 const GTTS_CHUNK = 180; // translate_tts accepts roughly 200 characters per request.
 const GTTS_MAX_CHUNKS = 12;
 const SILENT_NATIVE_MS = 3000; // no `start` event by then: treat native speech as silent
-const VOICE_WAIT_MS = 600; // Chrome loads the voice list asynchronously.
+const VOICE_WAIT_MS = 1000; // Chrome loads the voice list asynchronously.
 // Tiny silent WAV, played inside the click to unlock audio (Safari/iOS block play() after an await).
 const SILENT_WAV = "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=";
 
@@ -58,7 +56,7 @@ function findVoice(voices: SpeechSynthesisVoice[], lang: Locale): SpeechSynthesi
   );
 }
 
-/** The voice list is empty on first load in Chrome; wait briefly for `voiceschanged`. */
+/** The voice list is empty on first load in Chrome; wait for `voiceschanged` (bounded). */
 function loadVoices(): Promise<SpeechSynthesisVoice[]> {
   if (typeof window === "undefined" || !("speechSynthesis" in window)) return Promise.resolve([]);
   const synth = window.speechSynthesis;
@@ -76,7 +74,7 @@ function loadVoices(): Promise<SpeechSynthesisVoice[]> {
 }
 
 type Status = "idle" | "loading" | "playing" | "paused";
-type Engine = "native" | "gemini" | "gtts";
+type Engine = "native" | "audio";
 
 interface SmartReaderProps {
   /** Plain text to read. */
@@ -89,25 +87,23 @@ interface SmartReaderProps {
 }
 
 /**
- * Read-aloud control. Engine order:
- *  1. the browser's Speech Synthesis, when it has a voice for the language;
- *  2. server-side TTS (/api/tts, Gemini), which covers Georgian and Armenian;
- *  3. Google Translate TTS played straight from the browser, as a last resort when
- *     the server engine is unavailable (quota, not configured, network).
+ * Read-aloud control that needs no API key. Order of attempts:
+ *  1. Web Speech API with an installed voice for the language (ka-GE, hy-AM, en-US);
+ *  2. Google Translate's free TTS stream, played with an HTML5 Audio element;
+ *  3. Web Speech API with the browser's default voice for that language tag.
+ * If all of them fail the button just returns to idle: no error message is shown.
  * The main button toggles play / pause / resume; the square button stops.
  */
 export function SmartReader({ text, lang, compact = false, className }: SmartReaderProps) {
   const t = useT();
   const [status, setStatus] = useState<Status>("idle");
   const [progress, setProgress] = useState(0);
-  const [error, setError] = useState(false);
 
   const run = useRef(0); // bumped on stop/restart so stale callbacks do nothing
   const engine = useRef<Engine | null>(null);
   const audio = useRef<HTMLAudioElement | null>(null);
   /** One element, unlocked by the click, reused for every chunk. */
   const player = useRef<HTMLAudioElement | null>(null);
-  const objectUrls = useRef<string[]>([]);
 
   const cleanup = useCallback(() => {
     run.current++;
@@ -115,8 +111,6 @@ export function SmartReader({ text, lang, compact = false, className }: SmartRea
     audio.current?.pause();
     audio.current = null;
     player.current = null;
-    objectUrls.current.forEach((u) => URL.revokeObjectURL(u));
-    objectUrls.current = [];
     engine.current = null;
   }, []);
 
@@ -130,17 +124,30 @@ export function SmartReader({ text, lang, compact = false, className }: SmartRea
   // Stop speaking when the card/page goes away or the text changes.
   useEffect(() => stop, [stop, text]);
 
-  const playNative = (chunks: string[], language: Locale, voices: SpeechSynthesisVoice[], token: number) => {
+  /** Web Speech API. `onFail` runs if it errors or never makes a sound. */
+  const playNative = (
+    chunks: string[],
+    language: Locale,
+    voice: SpeechSynthesisVoice | undefined,
+    token: number,
+    onFail: () => void,
+  ) => {
     const synth = window.speechSynthesis;
-    const voice = findVoice(voices, language);
     const total = chunks.reduce((n, c) => n + c.length, 0) || 1;
     let done = 0;
     let started = false;
-    let aborted = false; // set when a silent native engine is replaced by the server engines
+    let failed = false;
     engine.current = "native";
 
+    const fail = () => {
+      if (failed || token !== run.current) return;
+      failed = true;
+      synth.cancel();
+      onFail();
+    };
+
     const speak = (i: number) => {
-      if (token !== run.current || aborted) return;
+      if (token !== run.current || failed) return;
       if (i >= chunks.length) return stop();
       const u = new SpeechSynthesisUtterance(chunks[i]);
       u.lang = voice?.lang ?? BCP47[language];
@@ -158,9 +165,8 @@ export function SmartReader({ text, lang, compact = false, className }: SmartRea
         speak(i + 1);
       };
       u.onerror = (e) => {
-        if (token !== run.current || aborted || e.error === "canceled" || e.error === "interrupted") return;
-        // Native engine failed: continue with the server engines from the start.
-        void playRemote(language, token);
+        if (token !== run.current || failed || e.error === "canceled" || e.error === "interrupted") return;
+        fail();
       };
       synth.speak(u);
     };
@@ -168,37 +174,25 @@ export function SmartReader({ text, lang, compact = false, className }: SmartRea
 
     // Some browsers accept the utterance but never produce sound (no real voice behind it).
     window.setTimeout(() => {
-      if (started || token !== run.current) return;
-      aborted = true;
-      synth.cancel();
-      void playRemote(language, token);
+      if (!started) fail();
     }, SILENT_NATIVE_MS);
   };
 
-  /** Plays audio pieces in order, prefetching the next. Resolves true if anything played. */
-  const playPieces = async (
-    count: number,
-    urlFor: (i: number) => Promise<string>,
-    token: number,
-  ): Promise<{ finished: boolean; started: boolean }> => {
+  /** Plays free Google Translate TTS pieces in order on the unlocked element. */
+  const playGoogle = async (clean: string, language: Locale, token: number, onFail: () => void) => {
+    engine.current = "audio";
+    const parts = chunkText(clean, GTTS_CHUNK).slice(0, GTTS_MAX_CHUNKS);
     let started = false;
     try {
-      let next = urlFor(0);
-      next.catch(() => {}); // a prefetch we abandon must not surface as an unhandled rejection
-      for (let i = 0; i < count; i++) {
-        const url = await next;
-        if (token !== run.current) return { finished: false, started };
-        if (i + 1 < count) {
-          next = urlFor(i + 1);
-          next.catch(() => {});
-        }
+      for (let i = 0; i < parts.length; i++) {
+        if (token !== run.current) return;
         const el = player.current ?? new Audio();
         player.current = el;
         audio.current = el;
-        el.src = url;
+        el.src = `https://translate.google.com/translate_tts?ie=UTF-8&tl=${language}&client=tw-ob&q=${encodeURIComponent(parts[i])}`;
         await new Promise<void>((resolve, reject) => {
           el.ontimeupdate = () => {
-            if (token === run.current && el.duration) setProgress((i + el.currentTime / el.duration) / count);
+            if (token === run.current && el.duration) setProgress((i + el.currentTime / el.duration) / parts.length);
           };
           el.onplaying = () => {
             started = true;
@@ -208,67 +202,13 @@ export function SmartReader({ text, lang, compact = false, className }: SmartRea
           el.onerror = () => reject(new Error("audio"));
           el.play().catch(reject);
         });
-        if (token !== run.current) return { finished: false, started };
       }
-    } catch (e) {
-      throw Object.assign(e instanceof Error ? e : new Error("audio"), { started });
-    }
-    return { finished: true, started };
-  };
-
-  const playRemote = async (language: Locale, token: number) => {
-    if (token !== run.current) return;
-    setStatus("loading");
-    setProgress(0);
-    const clean = text.replace(/\s+/g, " ").trim();
-
-    // Engine 2: Gemini TTS through our API.
-    engine.current = "gemini";
-    const parts = chunkText(clean, SERVER_CHUNK).slice(0, SERVER_MAX_CHUNKS);
-    try {
-      const r = await playPieces(
-        parts.length,
-        async (i) => {
-          const res = await fetch("/api/tts", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ text: parts[i], lang: language }),
-          });
-          if (!res.ok) throw new Error(String(res.status));
-          const url = URL.createObjectURL(await res.blob());
-          objectUrls.current.push(url);
-          return url;
-        },
-        token,
-      );
-      if (token !== run.current) return;
-      if (r.finished) return stop();
-    } catch (e) {
-      if (token !== run.current) return;
-      // Audio that already started playing is not restarted on another engine.
-      if ((e as { started?: boolean }).started) {
-        setError(true);
-        return stop();
-      }
-    }
-
-    // Engine 3: Google Translate TTS, played directly by the browser.
-    if (token !== run.current) return;
-    engine.current = "gtts";
-    setProgress(0);
-    const small = chunkText(clean, GTTS_CHUNK).slice(0, GTTS_MAX_CHUNKS);
-    try {
-      await playPieces(
-        small.length,
-        async (i) =>
-          `https://translate.google.com/translate_tts?ie=UTF-8&tl=${language}&client=tw-ob&q=${encodeURIComponent(small[i])}`,
-        token,
-      );
       if (token === run.current) stop();
     } catch {
       if (token !== run.current) return;
-      setError(true);
-      stop();
+      // Audio that already played is not restarted on another engine.
+      if (started) return stop();
+      onFail();
     }
   };
 
@@ -278,7 +218,6 @@ export function SmartReader({ text, lang, compact = false, className }: SmartRea
     stopActive?.(); // silence any other reader first
     cleanup();
     stopActive = stop;
-    setError(false);
     setProgress(0);
     setStatus("loading");
 
@@ -289,13 +228,24 @@ export function SmartReader({ text, lang, compact = false, className }: SmartRea
 
     const language = lang ?? detectLang(clean);
     const token = run.current;
-    const voices = await loadVoices();
+    const hasSpeech = "speechSynthesis" in window;
+    const voices = await loadVoices(); // waits for onvoiceschanged
     if (token !== run.current) return;
 
-    if (findVoice(voices, language)) {
-      playNative(chunkText(clean, NATIVE_CHUNK), language, voices, token);
+    const nativeChunks = chunkText(clean, NATIVE_CHUNK);
+    const voice = findVoice(voices, language);
+    // Last resort: the browser's default voice for the language tag, if it has speech at all.
+    const lastResort = () => {
+      if (hasSpeech) playNative(nativeChunks, language, undefined, token, stop);
+      else stop();
+    };
+
+    if (voice) {
+      // Installed voice -> free Google stream -> default voice.
+      playNative(nativeChunks, language, voice, token, () => void playGoogle(clean, language, token, lastResort));
     } else {
-      void playRemote(language, token);
+      // No installed voice (typical for ka/hy) -> free Google stream -> default voice.
+      void playGoogle(clean, language, token, lastResort);
     }
   };
 
@@ -372,11 +322,6 @@ export function SmartReader({ text, lang, compact = false, className }: SmartRea
         {status === "playing" && t("reader.playing")}
         {status === "paused" && t("reader.paused")}
       </span>
-      {error && (
-        <span role="alert" className="text-xs font-medium text-verdict-fakeink">
-          {t("reader.unavailable")}
-        </span>
-      )}
     </div>
   );
 }
