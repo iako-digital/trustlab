@@ -35,8 +35,11 @@ $("refresh").addEventListener("click", () => {
   });
 });
 
-// Result of the last right-click "Check with TrustLab".
+// ---- Live check panel -------------------------------------------------------------------
 const AI_LABEL = { TRUE: "TRUE", FAKE: "FAKE", MANIPULATIVE: "MANIPULATIVE", UNVERIFIED: "UNVERIFIED" };
+const MIN_CHARS = 15;
+const SLOW_MS = 20000;
+const GIVE_UP_MS = 70000;
 
 function el(tag, cls, text) {
   const n = document.createElement(tag);
@@ -45,7 +48,60 @@ function el(tag, cls, text) {
   return n;
 }
 
-function renderAi(box, ai) {
+const box = $("check");
+let runId = 0; // bumped on every new state so late callbacks are ignored
+let slowTimer = null;
+let giveUpTimer = null;
+
+function clearTimers() {
+  clearTimeout(slowTimer);
+  clearTimeout(giveUpTimer);
+}
+
+function show(...nodes) {
+  box.replaceChildren(...nodes);
+  box.hidden = false;
+}
+
+function quote(text) {
+  return el("blockquote", null, `\u201c${String(text).slice(0, 300)}\u201d`);
+}
+
+function showLoading(text) {
+  clearTimers();
+  const spinner = el("span", "spinner");
+  spinner.setAttribute("aria-hidden", "true");
+  const row = el("div", "loading-row");
+  const label = el("p", "loading-text", "\u10DB\u10DD\u10EC\u10DB\u10D3\u10D4\u10D1\u10D0 AI-\u10E1 \u10DB\u10D8\u10D4\u10E0... / Fact-checking in progress...");
+  row.append(spinner, label);
+  const dots = el("span", "dots");
+  dots.setAttribute("aria-hidden", "true");
+  dots.append(el("i"), el("i"), el("i"));
+  const wrap = el("div", "loading");
+  wrap.setAttribute("role", "status");
+  wrap.setAttribute("aria-live", "polite");
+  wrap.append(row, dots);
+  show(quote(text), wrap);
+  slowTimer = setTimeout(() => {
+    label.textContent = "\u10E8\u10D4\u10DB\u10DD\u10EC\u10DB\u10D4\u10D1\u10D0 \u10D2\u10D0\u10E1\u10D0\u10E6\u10D4\u10D1\u10D0 \u10DB\u10D4\u10E2\u10E1 \u10D3\u10E0\u10DD\u10E1 \u10D8\u10D7\u10EE\u10DD\u10D5\u10E1\u2026 / Still working, this is taking longer than usual\u2026";
+  }, SLOW_MS);
+}
+
+function showError(text, message, retryText) {
+  clearTimers();
+  const retry = el("button", "retry", "\u10EE\u10D4\u10DA\u10D0\u10EE\u10DA\u10D0 \u10EA\u10D3\u10D0 / Retry");
+  retry.type = "button";
+  retry.addEventListener("click", () => runCheck(retryText || text));
+  const msg = el("p", "result error", message);
+  msg.setAttribute("role", "alert");
+  show(quote(text), msg, retry);
+}
+
+function showHint() {
+  show(el("p", "hint", "Select some text on the page, then open TrustLab again, or right-click it and choose \u201cCheck with TrustLab\u201d."));
+}
+
+function renderAi(ai) {
   const card = el("div", "ai-card");
   card.append(el("p", "ai-eyebrow", "AI Live Fact-Check"));
   card.append(el("span", `ai-verdict ai-${ai.verdict.toLowerCase()}`, AI_LABEL[ai.verdict]));
@@ -73,37 +129,99 @@ function renderAi(box, ai) {
         : "AI result from live web search. Not a TrustLab editorial verdict.",
     ),
   );
-  box.append(card);
+  return card;
 }
 
-chrome.storage.local.get("lastCheck", ({ lastCheck }) => {
-  chrome.action.setBadgeText({ text: "" });
-  if (!lastCheck) return;
-  const box = $("check");
-  box.append(el("blockquote", null, `\u201c${lastCheck.text}\u201d`));
+function errorText(check) {
+  const kind = check.aiError && check.aiError.kind;
+  return kind === "rate"
+    ? "Too many live checks right now. Try again in a few minutes."
+    : kind === "unconfigured"
+      ? "The live AI check is not configured on the TrustLab server yet."
+      : kind === "timeout"
+        ? "The check took too long. Please try again."
+        : kind === "http"
+          ? "The TrustLab server could not complete the check. Try again later."
+          : `Could not reach the TrustLab site (${check.baseUrl || "unknown address"}). Check the site address in the settings below.`;
+}
 
-  if (lastCheck.match) {
-    const t = lastCheck.match.title || {};
+function showCheck(check) {
+  clearTimers();
+  chrome.action.setBadgeText({ text: "" });
+  const text = check.text;
+  if (check.match) {
+    const t = check.match.title || {};
     const a = el("a", null, t.en || t.ka || t.hy || "View fact-check");
-    a.href = `${lastCheck.baseUrl}/claim/${lastCheck.match.id}`;
+    a.href = `${check.baseUrl}/claim/${check.match.id}`;
     a.target = "_blank";
     a.rel = "noopener noreferrer";
     const result = el("p", "result");
-    result.append(`Match (${lastCheck.match.status}): `, a);
-    box.append(result);
-  } else if (lastCheck.ai) {
-    renderAi(box, lastCheck.ai);
+    result.append(`Match (${check.match.status}): `, a);
+    show(quote(text), result);
+  } else if (check.ai) {
+    show(quote(text), renderAi(check.ai));
   } else {
-    const kind = lastCheck.aiError && lastCheck.aiError.kind;
-    const msg =
-      kind === "rate"
-        ? "Too many live checks right now. Try again in a few minutes."
-        : kind === "unconfigured"
-          ? "The live AI check is not configured on the TrustLab server yet."
-          : kind === "http"
-            ? "The TrustLab server could not complete the check. Try again later."
-            : `Could not reach the TrustLab site (${lastCheck.baseUrl || "unknown address"}). Check the site address in the settings below.`;
-    box.append(el("p", "result", msg));
+    showError(text, errorText(check), check.query);
   }
-  box.hidden = false;
-});
+}
+
+/** Starts a check from inside the popup: loading state first, then the background does the work. */
+function runCheck(text) {
+  const id = ++runId;
+  if (text.trim().length < MIN_CHARS) {
+    return showError(text, `Select a longer text (at least ${MIN_CHARS} characters).`, text);
+  }
+  showLoading(text);
+  giveUpTimer = setTimeout(() => {
+    if (id === runId) showError(text, "The check took too long. Please try again.", text);
+  }, GIVE_UP_MS);
+  chrome.runtime.sendMessage({ type: "check", text }, (res) => {
+    if (id !== runId) return;
+    if (chrome.runtime.lastError || !res || !res.check) {
+      console.error("[TrustLab] popup check failed", chrome.runtime.lastError);
+      return showError(text, "The extension could not run the check. Please try again.", text);
+    }
+    showCheck(res.check);
+  });
+}
+
+/** The text highlighted on the active tab (any page, any frame), or "". */
+async function readSelection() {
+  try {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (!tab || tab.id == null) return "";
+    const results = await chrome.scripting.executeScript({
+      target: { tabId: tab.id, allFrames: true },
+      func: () => String(window.getSelection() || "").trim(),
+    });
+    return results.map((r) => r.result || "").sort((a, b) => b.length - a.length)[0] || "";
+  } catch (e) {
+    console.warn("[TrustLab] cannot read the selection on this page", e); // chrome:// pages, the web store, …
+    return "";
+  }
+}
+
+(async () => {
+  const { pendingCheck, lastCheck } = await chrome.storage.local.get(["pendingCheck", "lastCheck"]);
+
+  // Opened by the right-click menu: the background is already checking, so just wait for it.
+  if (pendingCheck && Date.now() - pendingCheck.at < GIVE_UP_MS) {
+    const id = ++runId;
+    showLoading(pendingCheck.text);
+    giveUpTimer = setTimeout(() => {
+      if (id === runId) showError(pendingCheck.text, "The check took too long. Please try again.", pendingCheck.text);
+    }, GIVE_UP_MS - (Date.now() - pendingCheck.at));
+    chrome.storage.onChanged.addListener((changes, area) => {
+      const next = changes.lastCheck && changes.lastCheck.newValue;
+      if (area === "local" && next && next.at >= pendingCheck.at && id === runId) showCheck(next);
+    });
+    return;
+  }
+
+  // Opened with text highlighted on the page: check it right away.
+  const selection = await readSelection();
+  if (selection) return runCheck(selection);
+
+  if (lastCheck) showCheck(lastCheck);
+  else showHint();
+})();

@@ -41,6 +41,10 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
       } catch (e) {
         sendResponse({ ok: false, enabled, baseUrl, error: String(e) });
       }
+    } else if (msg?.type === "check") {
+      const check = await performCheck(msg.text);
+      await chrome.storage.local.set({ lastCheck: check });
+      sendResponse({ ok: true, check });
     } else if (msg?.type === "refresh") {
       try {
         const claims = await loadClaims(true);
@@ -89,9 +93,11 @@ async function realtimeCheck(baseUrl, text) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ text }),
+      signal: AbortSignal.timeout(50000),
     });
   } catch (e) {
-    throw Object.assign(new Error(`network: ${e}`), { kind: "network" });
+    const timedOut = e && (e.name === "TimeoutError" || e.name === "AbortError");
+    throw Object.assign(new Error(`${timedOut ? "timeout" : "network"}: ${e}`), { kind: timedOut ? "timeout" : "network" });
   }
   if (!res.ok) {
     const body = await res.text().catch(() => "");
@@ -112,12 +118,11 @@ async function realtimeCheck(baseUrl, text) {
   };
 }
 
-chrome.contextMenus.onClicked.addListener(async (info) => {
-  if (info.menuItemId !== "trustlab-check") return;
-  const text = (info.selectionText || "").trim();
-  if (!text) return;
+/** Local claims first, then the live AI check. Always resolves to a check object (never throws). */
+async function performCheck(rawText) {
+  const text = String(rawText || "").trim().slice(0, 1500);
   const { baseUrl } = await getSettings();
-  const check = { text: text.slice(0, 300), at: Date.now(), baseUrl, match: null };
+  const check = { text: text.slice(0, 300), query: text, at: Date.now(), baseUrl, match: null };
 
   try {
     const { buildIndex, findMatch } = self.TrustLabMatcher;
@@ -141,9 +146,21 @@ chrome.contextMenus.onClicked.addListener(async (info) => {
       setBadge("!", "#b91c1c");
     }
   }
+  return check;
+}
 
-  await chrome.storage.local.set({ lastCheck: check });
+// Right-click: open the popup AT ONCE (it shows a loading state), then run the check and
+// publish the result through storage, which the open popup is listening to.
+chrome.contextMenus.onClicked.addListener(async (info) => {
+  if (info.menuItemId !== "trustlab-check") return;
+  const text = (info.selectionText || "").trim();
+  if (!text) return;
+  await chrome.storage.local.set({ pendingCheck: { text: text.slice(0, 1500), at: Date.now() } });
+  setBadge("\u2026", "#6b7280");
   try {
     await chrome.action.openPopup(); // needs a recent Chrome; the badge is the fallback
   } catch {}
+  const check = await performCheck(text);
+  await chrome.storage.local.set({ lastCheck: check });
+  await chrome.storage.local.remove("pendingCheck");
 });
