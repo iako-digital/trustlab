@@ -83,12 +83,20 @@ function setBadge(text, color) {
 
 // No published claim matched: ask the site for a live, search-grounded AI check.
 async function realtimeCheck(baseUrl, text) {
-  const res = await fetch(`${baseUrl}/api/verify-realtime`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ text }),
-  });
-  if (!res.ok) throw new Error(`verify-realtime ${res.status}`);
+  let res;
+  try {
+    res = await fetch(`${baseUrl}/api/verify-realtime`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text }),
+    });
+  } catch (e) {
+    throw Object.assign(new Error(`network: ${e}`), { kind: "network" });
+  }
+  if (!res.ok) {
+    const kind = res.status === 429 ? "rate" : res.status === 503 ? "unconfigured" : "http";
+    throw Object.assign(new Error(`verify-realtime HTTP ${res.status}`), { kind });
+  }
   const j = await res.json();
   if (!AI_BADGE[j.verdict]) throw new Error("bad verdict");
   return {
@@ -113,6 +121,7 @@ chrome.contextMenus.onClicked.addListener(async (info) => {
     const match = findMatch(buildIndex(await loadClaims(false)), text);
     if (match) check.match = { id: match.id, status: match.status, title: match.title };
   } catch (e) {
+    console.error("[TrustLab] could not load claims from", baseUrl, e);
     check.error = String(e); // local claims unavailable: still try the live check below
   }
 
@@ -124,7 +133,8 @@ chrome.contextMenus.onClicked.addListener(async (info) => {
       check.ai = await realtimeCheck(baseUrl, text);
       setBadge(...AI_BADGE[check.ai.verdict]);
     } catch (e) {
-      check.aiError = String(e);
+      console.error("[TrustLab] live check failed for", baseUrl, e);
+      check.aiError = { kind: e.kind || "network", message: String(e) };
       setBadge("!", "#b91c1c");
     }
   }

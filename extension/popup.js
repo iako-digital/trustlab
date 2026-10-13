@@ -86,7 +86,16 @@ chrome.storage.local.get("lastCheck", ({ lastCheck }) => {
   } else if (lastCheck.ai) {
     renderAi(box, lastCheck.ai);
   } else {
-    box.append(el("p", "result", "Could not reach the TrustLab site."));
+    const kind = lastCheck.aiError && lastCheck.aiError.kind;
+    const msg =
+      kind === "rate"
+        ? "Too many live checks right now. Try again in a few minutes."
+        : kind === "unconfigured"
+          ? "The live AI check is not configured on the TrustLab server yet."
+          : kind === "http"
+            ? "The TrustLab server could not complete the check. Try again later."
+            : `Could not reach the TrustLab site (${lastCheck.baseUrl || "unknown address"}). Check the site address in the settings below.`;
+    box.append(el("p", "result", msg));
   }
   box.hidden = false;
 });

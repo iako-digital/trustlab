@@ -5,13 +5,14 @@ import { rowToClaim } from "@/lib/claims-mapper";
 import { loadClaimRows } from "@/lib/claims-query";
 import { clientIp, rateLimit } from "@/lib/rate-limit";
 import { parseSubmission } from "@/lib/validation";
+import { preflight, withCors } from "@/lib/cors";
 
 export const dynamic = "force-dynamic";
 
 const NOT_CONFIGURED = NextResponse.json({ error: "Server is not configured." }, { status: 503 });
 
 /** Public feed: published claims only. */
-export async function GET() {
+async function getClaims() {
   if (!isSupabaseConfigured() || !process.env.SUPABASE_SERVICE_ROLE_KEY) return NOT_CONFIGURED;
 
   // Service client is used only for the verifier-name join; the state filter
@@ -28,6 +29,11 @@ export async function GET() {
     { headers: { "Cache-Control": "public, s-maxage=30, stale-while-revalidate=120" } },
   );
 }
+
+const READ_METHODS = "GET, OPTIONS";
+/** Cross-origin reads (browser extension); submissions below stay same-origin only. */
+export const GET = async () => withCors(await getClaims(), READ_METHODS);
+export const OPTIONS = () => preflight(READ_METHODS);
 
 /** Public submission. Always lands as `pending`; only an admin can publish. */
 export async function POST(req: NextRequest) {
