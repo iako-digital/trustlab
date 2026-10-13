@@ -4,7 +4,16 @@ import { geminiKey, geminiText, type GeminiKeyKind } from "@/lib/gemini";
 import { normalizeHttpUrl } from "@/lib/validation";
 
 export type ToolError = "not_configured" | "upstream";
-type Out<T> = { ok: true; value: T } | { ok: false; error: ToolError };
+type Out<T> = { ok: true; value: T } | { ok: false; error: ToolError; detail?: string };
+
+/** "model:status" pairs from geminiText failures: safe to show, never contains keys or message text. */
+export function failureDetail(failures: string[]): string {
+  return failures
+    .map((f) => /^(\S+): (\S+)/.exec(f))
+    .filter((m): m is RegExpExecArray => m !== null)
+    .map((m) => `${m[1]}:${m[2]}`)
+    .join(", ");
+}
 
 export interface GeminiPayload {
   candidates?: {
@@ -15,10 +24,16 @@ export interface GeminiPayload {
 
 export const LANG_NAME: Record<Locale, string> = { ka: "Georgian", hy: "Armenian", en: "English" };
 
-export async function run(body: unknown, tag: string, kind?: GeminiKeyKind): Promise<GeminiPayload | null> {
+export async function run(
+  body: unknown,
+  tag: string,
+  kind?: GeminiKeyKind,
+  sink?: { detail?: string },
+): Promise<GeminiPayload | null> {
   const { res, failures } = await geminiText(body, kind);
   if (!res || !res.ok) {
     console.error(`[${tag}] Gemini request failed:`, failures);
+    if (sink) sink.detail = failureDetail(failures);
     return null;
   }
   return (await res.json().catch(() => null)) as GeminiPayload | null;
@@ -56,6 +71,7 @@ export async function translateClaim(
 ): Promise<Out<Partial<Record<Locale, Translated>>>> {
   if (!geminiKey("translate")) return { ok: false, error: "not_configured" };
   const targets = LOCALES.filter((l) => l !== input.from);
+  const sink: { detail?: string } = {};
 
   const str = { type: "STRING" };
   const fields = {
@@ -90,8 +106,9 @@ export async function translateClaim(
     },
     "ai-translate",
     "translate",
+    sink,
   );
-  if (!payload) return { ok: false, error: "upstream" };
+  if (!payload) return { ok: false, error: "upstream", detail: sink.detail };
 
   const r = parseJsonObject(textOf(payload));
   if (!r) return { ok: false, error: "upstream" };
@@ -125,6 +142,8 @@ export async function resolveRedirect(uri: string): Promise<string> {
 }
 
 export interface Evidence {
+  /** False when the web search step was unavailable and no evidence was retrieved. */
+  grounded: boolean;
   /** Research notes written by the search step. */
   notes: string;
   /** Pages the search actually returned (never model-invented). */
@@ -138,6 +157,7 @@ export interface Evidence {
  */
 export async function searchEvidence(statement: string, maxSources: number): Promise<Out<Evidence>> {
   if (!geminiKey("search")) return { ok: false, error: "not_configured" };
+  const sink: { detail?: string } = {};
 
   const prompt = `You are a research assistant for the fact-checking editors of "TrustLab" (Georgia and Armenia).
 Search the web for evidence about the statement below. Prefer primary sources, official statements, established fact-checkers (e.g. mythdetector.ge, factcheck.ge, factcheck.am, AFP, Reuters) and reputable media.
@@ -156,8 +176,9 @@ ${statement}
     },
     "ai-search",
     "search",
+    sink,
   );
-  if (!payload) return { ok: false, error: "upstream" };
+  if (!payload) return { ok: false, error: "upstream", detail: sink.detail };
 
   const chunks = payload.candidates?.[0]?.groundingMetadata?.groundingChunks ?? [];
   const seen = new Set<string>();
@@ -179,11 +200,14 @@ ${statement}
     sources.push({ title: (c.web?.title || host || url).slice(0, 120), url });
   });
 
-  return { ok: true, value: { notes: textOf(payload).trim().slice(0, 3000), sources } };
+  return { ok: true, value: { grounded: true, notes: textOf(payload).trim().slice(0, 3000), sources } };
 }
 
 /** Evidence block handed to the verification step. */
 export function evidenceBlock(ev: Evidence): string {
+  if (!ev.grounded) {
+    return "WEB SEARCH WAS UNAVAILABLE: no evidence was retrieved and there are no sources. Judge cautiously from general knowledge only, say in the summary that it is not verified against live sources, and do not mention any source.";
+  }
   const list = ev.sources.map((s, i) => `${i + 1}. ${s.title} (${s.url})`).join("\n") || "(no pages found)";
   return `Research notes:\n${ev.notes || "(none)"}\n\nPages found:\n${list}`;
 }
@@ -214,8 +238,9 @@ export async function verifyClaim(input: {
   }`;
 
   const found = await searchEvidence(statement, 8);
-  if (!found.ok) return found;
-  const ev = found.value;
+  if (!found.ok && found.error === "not_configured") return found;
+  // A failing search (e.g. grounding quota) degrades to an ungrounded, clearly flagged answer.
+  const ev: Evidence = found.ok ? found.value : { grounded: false, notes: "", sources: [] };
 
   const str = { type: "STRING" };
   const { res, model, failures } = await geminiText(
@@ -246,7 +271,7 @@ export async function verifyClaim(input: {
   );
   if (!res || !res.ok) {
     console.error("[ai-verify] Gemini request failed:", failures);
-    return { ok: false, error: "upstream" };
+    return { ok: false, error: "upstream", detail: failureDetail(failures) };
   }
   const payload = (await res.json().catch(() => null)) as GeminiPayload | null;
   const r = payload ? parseJsonObject(textOf(payload)) : null;
@@ -267,7 +292,9 @@ export async function verifyClaim(input: {
     ok: true,
     value: {
       verdict: r.verdict,
-      summary: typeof r.summary === "string" ? r.summary.slice(0, 2000) : "",
+      summary:
+        (ev.grounded ? "" : "[Web search unavailable: based on model knowledge only, not verified against live sources.] ") +
+        (typeof r.summary === "string" ? r.summary.slice(0, 1900) : ""),
       tags,
       sources: ev.sources.map((s) => s.url),
       model,

@@ -11,6 +11,8 @@ const BCP47: Record<Locale, string> = { ka: "ka-GE", hy: "hy-AM", en: "en-US" };
 const NATIVE_CHUNK = 200; // Chrome silently stops long utterances; speak sentence-sized pieces.
 const GTTS_CHUNK = 180; // translate_tts accepts roughly 200 characters per request.
 const GTTS_MAX_CHUNKS = 12;
+const PROXY_CHUNK = 900; // /api/tts splits these into Google-sized pieces itself
+const PROXY_MAX_CHUNKS = 4; // the route is rate-limited per IP
 const SILENT_NATIVE_MS = 3000; // no `start` event by then: treat native speech as silent
 const VOICE_WAIT_MS = 1000; // Chrome loads the voice list asynchronously.
 // Tiny silent WAV, played inside the click to unlock audio (Safari/iOS block play() after an await).
@@ -178,21 +180,33 @@ export function SmartReader({ text, lang, compact = false, className }: SmartRea
     }, SILENT_NATIVE_MS);
   };
 
-  /** Plays free Google Translate TTS pieces in order on the unlocked element. */
-  const playGoogle = async (clean: string, language: Locale, token: number, onFail: () => void) => {
-    engine.current = "audio";
-    const parts = chunkText(clean, GTTS_CHUNK).slice(0, GTTS_MAX_CHUNKS);
+  /**
+   * Plays one pass of audio pieces on the unlocked element. Resolves "done", "failed"
+   * (nothing played yet: the caller may try another source) or "aborted".
+   */
+  const playPass = async (
+    count: number,
+    urlFor: (i: number) => Promise<string>,
+    token: number,
+  ): Promise<"done" | "failed" | "aborted"> => {
     let started = false;
     try {
-      for (let i = 0; i < parts.length; i++) {
-        if (token !== run.current) return;
+      let next = urlFor(0);
+      next.catch(() => {}); // an abandoned prefetch must not surface as an unhandled rejection
+      for (let i = 0; i < count; i++) {
+        const url = await next;
+        if (token !== run.current) return "aborted";
+        if (i + 1 < count) {
+          next = urlFor(i + 1);
+          next.catch(() => {});
+        }
         const el = player.current ?? new Audio();
         player.current = el;
         audio.current = el;
-        el.src = `https://translate.google.com/translate_tts?ie=UTF-8&tl=${language}&client=tw-ob&q=${encodeURIComponent(parts[i])}`;
+        el.src = url;
         await new Promise<void>((resolve, reject) => {
           el.ontimeupdate = () => {
-            if (token === run.current && el.duration) setProgress((i + el.currentTime / el.duration) / parts.length);
+            if (token === run.current && el.duration) setProgress((i + el.currentTime / el.duration) / count);
           };
           el.onplaying = () => {
             started = true;
@@ -202,14 +216,56 @@ export function SmartReader({ text, lang, compact = false, className }: SmartRea
           el.onerror = () => reject(new Error("audio"));
           el.play().catch(reject);
         });
+        if (token !== run.current) return "aborted";
       }
-      if (token === run.current) stop();
+      return "done";
     } catch {
-      if (token !== run.current) return;
-      // Audio that already played is not restarted on another engine.
-      if (started) return stop();
-      onFail();
+      if (token !== run.current) return "aborted";
+      return started ? "done" : "failed"; // audio that already played is not restarted elsewhere
     }
+  };
+
+  /**
+   * Free Google Translate TTS. First through our own /api/tts proxy (fetched as a Blob, so
+   * it works on any browser/OS), then straight from Google in the browser. Never shows an
+   * error: if both fail, `onFail` tries the default voice.
+   */
+  const playGoogle = async (clean: string, language: Locale, token: number, onFail: () => void) => {
+    engine.current = "audio";
+    const urls: string[] = [];
+
+    const viaProxy = chunkText(clean, PROXY_CHUNK).slice(0, PROXY_MAX_CHUNKS);
+    let r = await playPass(
+      viaProxy.length,
+      async (i) => {
+        const res = await fetch("/api/tts", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: viaProxy[i], lang: language }),
+        });
+        if (!res.ok) throw new Error(String(res.status));
+        const url = URL.createObjectURL(await res.blob());
+        urls.push(url);
+        return url;
+      },
+      token,
+    );
+
+    // Google's free voice has no Georgian/Armenian (HTTP 400), so the direct pass is English-only.
+    if (r === "failed" && language === "en") {
+      const direct = chunkText(clean, GTTS_CHUNK).slice(0, GTTS_MAX_CHUNKS);
+      r = await playPass(
+        direct.length,
+        async (i) =>
+          `https://translate.google.com/translate_tts?ie=UTF-8&tl=${language}&client=tw-ob&q=${encodeURIComponent(direct[i])}`,
+        token,
+      );
+    }
+
+    urls.forEach((u) => URL.revokeObjectURL(u));
+    if (token !== run.current) return;
+    if (r === "failed") onFail();
+    else stop();
   };
 
   const start = async () => {

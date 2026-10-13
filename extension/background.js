@@ -94,13 +94,16 @@ async function realtimeCheck(baseUrl, text) {
     throw Object.assign(new Error(`network: ${e}`), { kind: "network" });
   }
   if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    console.error(`[TrustLab] POST ${baseUrl}/api/verify-realtime -> HTTP ${res.status}`, body.slice(0, 500));
     const kind = res.status === 429 ? "rate" : res.status === 503 ? "unconfigured" : "http";
-    throw Object.assign(new Error(`verify-realtime HTTP ${res.status}`), { kind });
+    throw Object.assign(new Error(`verify-realtime HTTP ${res.status}: ${body.slice(0, 200)}`), { kind });
   }
   const j = await res.json();
   if (!AI_BADGE[j.verdict]) throw new Error("bad verdict");
   return {
     verdict: j.verdict,
+    grounded: j.grounded !== false,
     summary: String(j.summary || ""),
     sources: (Array.isArray(j.sources) ? j.sources : [])
       .filter((s) => s && /^https?:\/\//.test(s.url))

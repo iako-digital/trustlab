@@ -63,42 +63,53 @@ function pcmToWav(pcm: Uint8Array, sampleRate: number): Uint8Array {
   return new Uint8Array(Buffer.concat([header, pcm]));
 }
 
-/** Gemini TTS; returns a WAV, or null when unconfigured or failing (the caller then falls back). */
+/**
+ * Gemini TTS voices that can read Georgian and Armenian, tried in order. Free-tier quota is
+ * per model, so when one is exhausted (429) or busy (503) the next usually still answers.
+ */
+const TTS_MODELS = [
+  ...new Set([GEMINI_TTS_MODEL, "gemini-3.8-flash-lite-tts", "gemini-3.1-flash-tts-preview", "gemini-2.5-flash-preview-tts"]),
+];
+
+/** Gemini TTS; returns a WAV, or null when unconfigured or every model fails. */
 async function geminiVoice(text: string): Promise<Uint8Array | null> {
   if (!process.env.GEMINI_API_KEY) return null;
-  const res = await geminiGenerate(GEMINI_TTS_MODEL, {
-    contents: [{ parts: [{ text }] }],
-    generationConfig: {
-      responseModalities: ["AUDIO"],
-      speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: "Kore" } } },
-    },
-  });
-  if (!res || !res.ok) {
-    console.error("[tts] Gemini request failed:", res?.status ?? "no response", res ? (await res.text().catch(() => "")).slice(0, 300) : "");
-    return null;
+  for (const model of TTS_MODELS) {
+    const res = await geminiGenerate(model, {
+      contents: [{ parts: [{ text }] }],
+      generationConfig: {
+        responseModalities: ["AUDIO"],
+        speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: "Kore" } } },
+      },
+    });
+    if (!res || !res.ok) {
+      console.error(`[tts] ${model} failed:`, res?.status ?? "no response", res ? (await res.text().catch(() => "")).slice(0, 200) : "");
+      continue;
+    }
+    const payload = (await res.json().catch(() => null)) as {
+      candidates?: { content?: { parts?: { inlineData?: { mimeType?: string; data?: string } }[] } }[];
+    } | null;
+    const inline = payload?.candidates?.[0]?.content?.parts?.find((p) => p.inlineData?.data)?.inlineData;
+    if (!inline?.data) {
+      console.error(`[tts] ${model} returned no audio`);
+      continue;
+    }
+    let audio: Uint8Array = Buffer.from(inline.data, "base64");
+    const mime = inline.mimeType ?? "";
+    if (!mime.includes("wav")) {
+      // raw PCM, e.g. "audio/L16;codec=pcm;rate=24000"
+      const rate = Number(/rate=(\d+)/.exec(mime)?.[1] ?? 24000);
+      audio = pcmToWav(audio, rate);
+    }
+    return audio;
   }
-  const payload = (await res.json().catch(() => null)) as {
-    candidates?: { content?: { parts?: { inlineData?: { mimeType?: string; data?: string } }[] } }[];
-  } | null;
-  const inline = payload?.candidates?.[0]?.content?.parts?.find((p) => p.inlineData?.data)?.inlineData;
-  if (!inline?.data) {
-    console.error("[tts] Gemini returned no audio");
-    return null;
-  }
-  let audio: Uint8Array = Buffer.from(inline.data, "base64");
-  const mime = inline.mimeType ?? "";
-  if (!mime.includes("wav")) {
-    // e.g. "audio/L16;codec=pcm;rate=24000"
-    const rate = Number(/rate=(\d+)/.exec(mime)?.[1] ?? 24000);
-    audio = pcmToWav(audio, rate);
-  }
-  return audio;
+  return null;
 }
 
 /**
  * Server-side text-to-speech fallback for the Smart Reader, used when the
  * browser has no voice for the text's language (typically Georgian/Armenian).
- * Tries Gemini first (WAV), then Google Translate TTS (MP3).
+ * English: Google Translate TTS (MP3) first. Georgian/Armenian: Gemini TTS (WAV) with model fallback.
  * Public, so it is rate-limited and capped in length; it only voices text
  * the caller already has and never calls an LLM to generate content.
  */
@@ -124,13 +135,14 @@ export async function POST(req: NextRequest) {
   const lang = (body as { lang?: unknown }).lang;
   const language = typeof lang === "string" && LANGS.includes(lang) ? lang : "en";
 
-  // 1. Gemini voice (WAV).
+  // Google's free Translate voice does not support Georgian or Armenian (it answers HTTP 400),
+  // so those go straight to Gemini. Other languages try the free MP3 voice first.
+  if (language === "en") {
+    const mp3 = await googleTts(text.trim(), language);
+    if (mp3) return new NextResponse(mp3 as BodyInit, { headers: { "Content-Type": "audio/mpeg", "Cache-Control": "no-store" } });
+  }
   const wav = await geminiVoice(text.trim());
   if (wav) return new NextResponse(wav as BodyInit, { headers: { "Content-Type": "audio/wav", "Cache-Control": "no-store" } });
-
-  // 2. Fallback: Google Translate TTS (MP3).
-  const mp3 = await googleTts(text.trim(), language);
-  if (mp3) return new NextResponse(mp3 as BodyInit, { headers: { "Content-Type": "audio/mpeg", "Cache-Control": "no-store" } });
 
   return NextResponse.json({ error: "Text-to-speech failed." }, { status: 502 });
 }

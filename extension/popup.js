@@ -64,7 +64,15 @@ function renderAi(box, ai) {
     }
     card.append(list);
   }
-  card.append(el("p", "ai-note", "AI result from live web search. Not a TrustLab editorial verdict."));
+  card.append(
+    el(
+      "p",
+      "ai-note",
+      ai.grounded === false
+        ? "Live web search was unavailable: based on the AI's general knowledge only, not verified against sources. Not a TrustLab editorial verdict."
+        : "AI result from live web search. Not a TrustLab editorial verdict.",
+    ),
+  );
   box.append(card);
 }
 

@@ -71,6 +71,11 @@ export const BOT_TEXT = {
     hy: "Սա AI-ի արդյունք է համացանցային որոնման հիման վրա, ոչ թե TrustLab-ի խմբագրական վճիռ։",
     en: "This is an AI result from live web search, not a TrustLab editorial verdict.",
   } as L,
+  ungrounded: {
+    ka: "ინტერნეტ-ძიება ამჟამად მიუწვდომელია, ამიტომ პასუხი მხოლოდ AI-ის ზოგად ცოდნას ეფუძნება და ცოცხალ წყაროებთან გადამოწმებული არ არის.",
+    hy: "Համացանցային որոնումն այս պահին հասանելի չէ, ուստի պատասխանը հիմնված է միայն AI-ի ընդհանուր գիտելիքի վրա և չի ստուգվել կենդանի աղբյուրներով։",
+    en: "Web search is unavailable right now, so this answer rests on the AI's general knowledge only and was not checked against live sources.",
+  } as L,
   sources: { ka: "წყაროები", hy: "Աղբյուրներ", en: "Sources" } as L,
   fullCheck: { ka: "სრული შემოწმება", hy: "Ամբողջական ստուգում", en: "Read the full check" } as L,
   verdictLabel: { ka: "ვერდიქტი", hy: "Վճիռ", en: "Verdict" } as L,

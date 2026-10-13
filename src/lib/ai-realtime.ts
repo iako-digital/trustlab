@@ -1,10 +1,12 @@
 import "server-only";
 import { geminiKey, geminiText } from "@/lib/gemini";
 import {
+  failureDetail,
   evidenceBlock,
   parseJsonObject,
   searchEvidence,
   textOf,
+  type Evidence,
   type GeminiPayload,
   type ToolError,
 } from "@/lib/ai-admin-tools";
@@ -16,6 +18,8 @@ export interface RealtimeResult {
   verdict: RealtimeVerdict;
   summary: string;
   sources: { title: string; url: string }[];
+  /** False when live web search was unavailable: the verdict then rests on model knowledge only. */
+  grounded: boolean;
 }
 
 const LANG: Record<string, string> = { ka: "Georgian", hy: "Armenian", en: "English" };
@@ -28,13 +32,14 @@ const LANG: Record<string, string> = { ka: "Georgian", hy: "Armenian", en: "Engl
 export async function verifyRealtime(
   text: string,
   language?: string,
-): Promise<{ ok: true; value: RealtimeResult } | { ok: false; error: ToolError }> {
+): Promise<{ ok: true; value: RealtimeResult } | { ok: false; error: ToolError; detail?: string }> {
   if (!geminiKey("search") || !geminiKey("verify")) return { ok: false, error: "not_configured" };
   const replyIn = LANG[language ?? ""] ?? "the same language as the text";
 
   const found = await searchEvidence(text, 5);
-  if (!found.ok) return found;
-  const ev = found.value;
+  if (!found.ok && found.error === "not_configured") return found;
+  // A failing search (e.g. grounding quota) degrades to an ungrounded, clearly flagged answer.
+  const ev: Evidence = found.ok ? found.value : { grounded: false, notes: "", sources: [] };
 
   const { res, failures } = await geminiText(
     {
@@ -63,7 +68,7 @@ export async function verifyRealtime(
   );
   if (!res || !res.ok) {
     console.error("[verify-realtime] Gemini request failed:", failures);
-    return { ok: false, error: "upstream" };
+    return { ok: false, error: "upstream", detail: failureDetail(failures) };
   }
   const payload = (await res.json().catch(() => null)) as GeminiPayload | null;
   const r = payload ? parseJsonObject(textOf(payload)) : null;
@@ -76,6 +81,7 @@ export async function verifyRealtime(
       verdict,
       summary: typeof r.summary === "string" ? r.summary.trim().slice(0, 600) : "",
       sources: ev.sources,
+      grounded: ev.grounded,
     },
   };
 }

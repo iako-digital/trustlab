@@ -38,8 +38,11 @@ async function handle(req: NextRequest) {
   const out = await verifyRealtime(text, language);
   if (!out.ok) {
     return out.error === "not_configured"
-      ? NextResponse.json({ error: "AI is not configured.", code: "not_configured" }, { status: 503, headers: NO_STORE })
-      : NextResponse.json({ error: "AI request failed." }, { status: 502, headers: NO_STORE });
+      ? NextResponse.json({ error: "AI keys missing on server", code: "not_configured" }, { status: 503, headers: NO_STORE })
+      : NextResponse.json(
+          { error: "AI request failed.", code: "upstream", detail: out.detail },
+          { status: 502, headers: NO_STORE },
+        );
   }
   return NextResponse.json(out.value, { headers: NO_STORE });
 }

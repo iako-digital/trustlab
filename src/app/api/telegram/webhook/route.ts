@@ -114,7 +114,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true });
   }
 
-  const { verdict, summary, sources } = out.value;
+  const { verdict, summary, sources, grounded } = out.value;
   const parts = [
     BOT_TEXT.aiHeader[lang],
     `${BOT_TEXT.verdictLabel[lang]}: <b>${html.esc(VERDICT_TEXT[verdict][lang])}</b>`,
@@ -125,6 +125,7 @@ export async function POST(req: NextRequest) {
       `${BOT_TEXT.sources[lang]}:\n${sources.map((s, i) => `${i + 1}. ${html.link(s.url, s.title)}`).join("\n")}`,
     );
   }
+  if (!grounded) parts.push(`<i>${html.esc(BOT_TEXT.ungrounded[lang])}</i>`);
   parts.push(`<i>${html.esc(BOT_TEXT.aiNote[lang])}</i>`);
   await sendTelegramMessage(chatId, parts.join("\n\n"));
   return NextResponse.json({ ok: true });
