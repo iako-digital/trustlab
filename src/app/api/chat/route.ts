@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { clientIp, rateLimit } from "@/lib/rate-limit";
-import { geminiText } from "@/lib/gemini";
+import { geminiKey, geminiText } from "@/lib/gemini";
 
 export const dynamic = "force-dynamic";
 
@@ -55,8 +55,8 @@ export async function POST(req: NextRequest) {
       { status: 429, headers: { "Retry-After": String(limited.retryAfterSec) } },
     );
   }
-  if (!process.env.GEMINI_API_KEY) {
-    console.error("[api/chat] GEMINI_API_KEY is not set in process.env");
+  if (!geminiKey()) {
+    console.error("[api/chat] no Gemini key is set (GEMINI_API_KEY / GEMINI_API_KEYS)");
     return NextResponse.json({ error: "Chat is not configured.", code: "not_configured" }, { status: 503 });
   }
 

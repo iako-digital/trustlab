@@ -1,6 +1,6 @@
 import "server-only";
 import { LOCALES, type Locale, type Verdict } from "@/lib/types";
-import { geminiText } from "@/lib/gemini";
+import { geminiKey, geminiText } from "@/lib/gemini";
 
 
 const SYSTEM_PROMPT = `You are an AI assistant for the fact-checking editors of "TrustLab", which debunks disinformation in the South Caucasus (Georgia and Armenia).
@@ -45,8 +45,7 @@ function isLoc(v: unknown): v is Record<Locale, string> {
 export async function generateSuggestion(
   claimText: string,
 ): Promise<{ ok: true; value: GeneratedSuggestion } | { ok: false; error: SuggestError }> {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) return { ok: false, error: "not_configured" };
+  if (!geminiKey()) return { ok: false, error: "not_configured" };
 
   try {
     const { res, model, failures } = await geminiText({

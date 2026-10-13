@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { clientIp, rateLimit } from "@/lib/rate-limit";
-import { GEMINI_TTS_MODEL, geminiGenerate } from "@/lib/gemini";
+import { GEMINI_TTS_MODEL, geminiGenerate, geminiKey } from "@/lib/gemini";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -73,7 +73,7 @@ const TTS_MODELS = [
 
 /** Gemini TTS; returns a WAV, or null when unconfigured or every model fails. */
 async function geminiVoice(text: string): Promise<Uint8Array | null> {
-  if (!process.env.GEMINI_API_KEY) return null;
+  if (!geminiKey()) return null;
   for (const model of TTS_MODELS) {
     const res = await geminiGenerate(model, {
       contents: [{ parts: [{ text }] }],
