@@ -5,6 +5,7 @@ import { Navbar } from "@/components/navbar";
 import { Logo } from "@/components/logo";
 import { FacebookLink } from "@/components/facebook-link";
 import { InstagramLink } from "@/components/instagram-link";
+import { TelegramLink } from "@/components/telegram-link";
 import { THEME_INIT_SCRIPT } from "@/lib/theme";
 
 export const metadata: Metadata = {
@@ -75,6 +76,7 @@ function Footer() {
           </p>
           <FacebookLink />
           <InstagramLink />
+          <TelegramLink />
         </div>
       </div>
     </footer>

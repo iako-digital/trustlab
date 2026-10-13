@@ -5,11 +5,10 @@ import { Bot, Send, MessageCircle, ShieldCheck, ThumbsUp, ArrowRight } from "luc
 import { Card } from "@/components/ui/card";
 import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
+import { TELEGRAM_URL } from "@/lib/social";
 import { useT } from "@/lib/i18n";
 
 /** Bot username without "@" (matches the handle shown in the card). */
-const TELEGRAM_BOT = (process.env.NEXT_PUBLIC_TELEGRAM_BOT ?? "TrustLabBot").replace(/^@/, "");
-const TELEGRAM_URL = `https://t.me/${TELEGRAM_BOT}`;
 /** International format, digits only (e.g. 995555123456). Unset until a real number exists. */
 const WHATSAPP_NUMBER = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "").replace(/\D/g, "");
 const WHATSAPP_URL = WHATSAPP_NUMBER ? `https://wa.me/${WHATSAPP_NUMBER}` : null;

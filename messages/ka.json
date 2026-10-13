@@ -268,7 +268,7 @@
     "step3Desc": "მიიღეთ მკაფიო პასუხი: სიმართლე, მცდარი, მანიპულირებადი ან განხილვის პროცესშია.",
     "whatsappCta": "WhatsApp-ზე მიწერა",
     "telegramCta": "Telegram-ზე მიწერა",
-    "handle": "@TrustLabBot",
+    "handle": "@trustlab_bot",
     "modalTitle": "დაწერეთ TrustLabBot-ს",
     "modalBody": "ბოტი ამჟამად პირად ბეტა-რეჟიმშია. დატოვეთ თქვენი ელფოსტა „განცხადების გამოგზავნის“ გვერდზე ან გამოგვყევით, რომ გაშვების შესახებ პირველმა შეიტყოთ.",
     "modalClose": "დახურვა"
@@ -302,7 +302,8 @@
   },
   "social": {
     "facebook": "TrustLab Facebook-ზე",
-    "instagram": "TrustLab Instagram-ზე"
+    "instagram": "TrustLab Instagram-ზე",
+    "telegram": "TrustLab Telegram-ზე"
   },
   "theme": {
     "toggle": "ღია და მუქი თემის გადართვა"

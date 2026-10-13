@@ -6,6 +6,7 @@ import { useT } from "@/lib/i18n";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { FacebookLink } from "@/components/facebook-link";
 import { InstagramLink } from "@/components/instagram-link";
+import { TelegramLink } from "@/components/telegram-link";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 const LINK =
@@ -41,6 +42,7 @@ export function Navbar() {
         <div className="order-2 flex shrink-0 items-center gap-0.5 sm:order-3 sm:gap-1">
           <FacebookLink />
           <InstagramLink />
+          <TelegramLink />
           <div className="ml-1">
             <LanguageSwitcher />
           </div>

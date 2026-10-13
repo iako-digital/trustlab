@@ -268,7 +268,7 @@
     "step3Desc": "Receive a clear reply: true, false, manipulative, or pending review.",
     "whatsappCta": "Chat on WhatsApp",
     "telegramCta": "Chat on Telegram",
-    "handle": "@TrustLabBot",
+    "handle": "@trustlab_bot",
     "modalTitle": "Chat with TrustLabBot",
     "modalBody": "The bot is currently in private beta. Leave your email on the Submit page or follow our channels to get notified at launch.",
     "modalClose": "Close"
@@ -302,7 +302,8 @@
   },
   "social": {
     "facebook": "TrustLab on Facebook",
-    "instagram": "TrustLab on Instagram"
+    "instagram": "TrustLab on Instagram",
+    "telegram": "TrustLab on Telegram"
   },
   "theme": {
     "toggle": "Switch between light and dark theme"
