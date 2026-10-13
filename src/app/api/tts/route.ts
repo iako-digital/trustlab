@@ -61,6 +61,7 @@ export async function POST(req: NextRequest) {
     },
   });
   if (!res || !res.ok) {
+    console.error("[tts] Gemini request failed:", res?.status ?? "no response", res ? (await res.text().catch(() => "")).slice(0, 300) : "");
     return NextResponse.json({ error: "Text-to-speech failed." }, { status: 502 });
   }
 
@@ -68,7 +69,10 @@ export async function POST(req: NextRequest) {
     candidates?: { content?: { parts?: { inlineData?: { mimeType?: string; data?: string } }[] } }[];
   } | null;
   const inline = payload?.candidates?.[0]?.content?.parts?.find((p) => p.inlineData?.data)?.inlineData;
-  if (!inline?.data) return NextResponse.json({ error: "No audio returned." }, { status: 502 });
+  if (!inline?.data) {
+    console.error("[tts] Gemini returned no audio");
+    return NextResponse.json({ error: "No audio returned." }, { status: 502 });
+  }
 
   let audio: Uint8Array = Buffer.from(inline.data, "base64");
   const mime = inline.mimeType ?? "";

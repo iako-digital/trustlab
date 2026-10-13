@@ -14,6 +14,8 @@ const SERVER_MAX_CHUNKS = 4;
 const GTTS_CHUNK = 180; // translate_tts accepts roughly 200 characters per request.
 const GTTS_MAX_CHUNKS = 12;
 const VOICE_WAIT_MS = 600; // Chrome loads the voice list asynchronously.
+// Tiny silent WAV, played inside the click to unlock audio (Safari/iOS block play() after an await).
+const SILENT_WAV = "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=";
 
 /** The page can hold many readers; only one may speak at a time. */
 let stopActive: (() => void) | null = null;
@@ -102,6 +104,8 @@ export function SmartReader({ text, lang, compact = false, className }: SmartRea
   const run = useRef(0); // bumped on stop/restart so stale callbacks do nothing
   const engine = useRef<Engine | null>(null);
   const audio = useRef<HTMLAudioElement | null>(null);
+  /** One element, unlocked by the click, reused for every chunk. */
+  const player = useRef<HTMLAudioElement | null>(null);
   const objectUrls = useRef<string[]>([]);
 
   const cleanup = useCallback(() => {
@@ -109,6 +113,7 @@ export function SmartReader({ text, lang, compact = false, className }: SmartRea
     if (typeof window !== "undefined" && "speechSynthesis" in window) window.speechSynthesis.cancel();
     audio.current?.pause();
     audio.current = null;
+    player.current = null;
     objectUrls.current.forEach((u) => URL.revokeObjectURL(u));
     objectUrls.current = [];
     engine.current = null;
@@ -173,8 +178,10 @@ export function SmartReader({ text, lang, compact = false, className }: SmartRea
           next = urlFor(i + 1);
           next.catch(() => {});
         }
-        const el = new Audio(url);
+        const el = player.current ?? new Audio();
+        player.current = el;
         audio.current = el;
+        el.src = url;
         await new Promise<void>((resolve, reject) => {
           el.ontimeupdate = () => {
             if (token === run.current && el.duration) setProgress((i + el.currentTime / el.duration) / count);
@@ -260,6 +267,11 @@ export function SmartReader({ text, lang, compact = false, className }: SmartRea
     setError(false);
     setProgress(0);
     setStatus("loading");
+
+    // Unlock audio playback while we are still inside the user gesture.
+    const el = new Audio(SILENT_WAV);
+    player.current = el;
+    void el.play().catch(() => {});
 
     const language = lang ?? detectLang(clean);
     const token = run.current;
