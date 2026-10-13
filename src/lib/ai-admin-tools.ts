@@ -206,7 +206,7 @@ ${statement}
 /** Evidence block handed to the verification step. */
 export function evidenceBlock(ev: Evidence): string {
   if (!ev.grounded) {
-    return "WEB SEARCH WAS UNAVAILABLE: no evidence was retrieved and there are no sources. Judge cautiously from general knowledge only, say in the summary that it is not verified against live sources, and do not mention any source.";
+    return "WEB SEARCH WAS UNAVAILABLE (quota), so there is no retrieved evidence and no sources. Judge the statement's plausibility from your own knowledge and give a definite verdict whenever you are reasonably confident: widely documented facts, well-known hoaxes, or claims that contradict established facts. Use UNVERIFIED only for opinions, events too recent for you to know, or claims that genuinely cannot be determined. Say in the summary that this rests on general knowledge, not live sources. Do not mention any source or URL.";
   }
   const list = ev.sources.map((s, i) => `${i + 1}. ${s.title} (${s.url})`).join("\n") || "(no pages found)";
   return `Research notes:\n${ev.notes || "(none)"}\n\nPages found:\n${list}`;
