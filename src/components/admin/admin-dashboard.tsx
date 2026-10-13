@@ -146,7 +146,7 @@ export function AdminDashboard() {
         (published.length === 0 ? (
           <EmptyState>{t("admin.publishedEmpty")}</EmptyState>
         ) : (
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
             {published.map((c) => (
               <div key={c.id} className="flex flex-col gap-2">
                 <ClaimCard claim={c} />

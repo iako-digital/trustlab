@@ -7,7 +7,7 @@ export const QUIZ_LEVELS: QuizLevel[] = [1, 2, 3];
 export const LEVEL_MULTIPLIER: Record<QuizLevel, number> = { 1: 1, 2: 2, 3: 3 };
 
 export const LEVEL_NAME: Record<QuizLevel, Localized> = {
-  1: { ka: "დაწყებითი", hy: "Սկսնակ", en: "Beginner" },
+  1: { ka: "დამწყები", hy: "Սկսնակ", en: "Beginner" },
   2: { ka: "საშუალო", hy: "Միջին", en: "Intermediate" },
   3: { ka: "ექსპერტი", hy: "Փորձագետ", en: "Expert" },
 };
