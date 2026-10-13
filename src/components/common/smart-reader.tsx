@@ -13,6 +13,7 @@ const SERVER_CHUNK = 1000; // /api/tts accepts up to 1200 characters.
 const SERVER_MAX_CHUNKS = 4;
 const GTTS_CHUNK = 180; // translate_tts accepts roughly 200 characters per request.
 const GTTS_MAX_CHUNKS = 12;
+const SILENT_NATIVE_MS = 3000; // no `start` event by then: treat native speech as silent
 const VOICE_WAIT_MS = 600; // Chrome loads the voice list asynchronously.
 // Tiny silent WAV, played inside the click to unlock audio (Safari/iOS block play() after an await).
 const SILENT_WAV = "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=";
@@ -134,15 +135,20 @@ export function SmartReader({ text, lang, compact = false, className }: SmartRea
     const voice = findVoice(voices, language);
     const total = chunks.reduce((n, c) => n + c.length, 0) || 1;
     let done = 0;
+    let started = false;
+    let aborted = false; // set when a silent native engine is replaced by the server engines
     engine.current = "native";
 
     const speak = (i: number) => {
-      if (token !== run.current) return;
+      if (token !== run.current || aborted) return;
       if (i >= chunks.length) return stop();
       const u = new SpeechSynthesisUtterance(chunks[i]);
       u.lang = voice?.lang ?? BCP47[language];
       if (voice) u.voice = voice;
-      u.onstart = () => token === run.current && setStatus("playing");
+      u.onstart = () => {
+        started = true;
+        if (token === run.current) setStatus("playing");
+      };
       u.onboundary = (e) => {
         if (token === run.current) setProgress((done + e.charIndex) / total);
       };
@@ -152,13 +158,21 @@ export function SmartReader({ text, lang, compact = false, className }: SmartRea
         speak(i + 1);
       };
       u.onerror = (e) => {
-        if (token !== run.current || e.error === "canceled" || e.error === "interrupted") return;
+        if (token !== run.current || aborted || e.error === "canceled" || e.error === "interrupted") return;
         // Native engine failed: continue with the server engines from the start.
         void playRemote(language, token);
       };
       synth.speak(u);
     };
     speak(0);
+
+    // Some browsers accept the utterance but never produce sound (no real voice behind it).
+    window.setTimeout(() => {
+      if (started || token !== run.current) return;
+      aborted = true;
+      synth.cancel();
+      void playRemote(language, token);
+    }, SILENT_NATIVE_MS);
   };
 
   /** Plays audio pieces in order, prefetching the next. Resolves true if anything played. */
