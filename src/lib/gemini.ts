@@ -13,13 +13,28 @@ export const TEXT_MODELS = [...new Set([GEMINI_MODEL, ...FALLBACK_MODELS])];
 
 const BASE = "https://generativelanguage.googleapis.com/v1beta/models";
 
+/** Dedicated keys per job; each falls back to GEMINI_API_KEY when its own key is not set. */
+export type GeminiKeyKind = "translate" | "search" | "verify";
+const KEY_ENV: Record<GeminiKeyKind, string> = {
+  translate: "GEMINI_TRANSLATE_KEY",
+  search: "GEMINI_SEARCH_KEY",
+  verify: "GEMINI_VERIFY_KEY",
+};
+export function geminiKey(kind?: GeminiKeyKind): string | undefined {
+  return (kind && process.env[KEY_ENV[kind]]?.trim()) || process.env.GEMINI_API_KEY || undefined;
+}
+
 /**
  * POSTs to Gemini generateContent. One retry on 429/503: those are the
  * "high demand" spikes the API recommends retrying. Returns null when the
  * key is missing or the network fails.
  */
-export async function geminiGenerate(model: string, body: unknown): Promise<Response | null> {
-  const apiKey = process.env.GEMINI_API_KEY;
+export async function geminiGenerate(
+  model: string,
+  body: unknown,
+  kind?: GeminiKeyKind,
+): Promise<Response | null> {
+  const apiKey = geminiKey(kind);
   if (!apiKey) return null;
   for (let attempt = 0; attempt < 2; attempt++) {
     try {
@@ -50,11 +65,11 @@ export interface TextResult {
 }
 
 /** Like geminiGenerate, but falls through TEXT_MODELS on 404/429/503. */
-export async function geminiText(body: unknown): Promise<TextResult> {
+export async function geminiText(body: unknown, kind?: GeminiKeyKind): Promise<TextResult> {
   const failures: string[] = [];
   let last: { res: Response | null; model: string } = { res: null, model: TEXT_MODELS[0] };
   for (const model of TEXT_MODELS) {
-    const res = await geminiGenerate(model, body);
+    const res = await geminiGenerate(model, body, kind);
     last = { res, model };
     if (res?.ok) return { ...last, failures };
     const detail = res ? (await res.clone().text().catch(() => "")).slice(0, 200) : "network error / no key";
