@@ -137,7 +137,7 @@
     "aiIncomplete": "Fill in all three titles and the explanation in the source language (use Edit) before approving.",
     "aiBusy": "Working…",
     "aiRateLimited": "Too many requests. Try again shortly.",
-    "aiNotConfigured": "AI is not configured on the server.",
+    "aiNotConfigured": "AI is not configured (GEMINI_API_KEY is missing).",
     "newClaim": "New claim",
     "editClaim": "Edit claim",
     "edit": "Edit",
@@ -158,7 +158,19 @@
     "coverUpload": "Upload image",
     "coverUploading": "Uploading…",
     "coverRemove": "Remove image",
-    "coverUploadFailed": "Upload failed. Use a JPEG, PNG or WebP image under 3 MB."
+    "coverUploadFailed": "Upload failed. Use a JPEG, PNG or WebP image under 3 MB.",
+    "autoTranslate": "Auto-translate",
+    "verifyWithAi": "Verify & find sources with AI",
+    "verifyBusy": "Researching…",
+    "aiDraftNote": "AI output is a draft. Translation fills the other two languages from {lang}; the verdict is only a suggestion. Nothing is published until you pick a verdict yourself and save.",
+    "aiNeedSource": "Fill in the {lang} title and claim first.",
+    "aiTooMany": "Too many AI requests. Wait a minute and try again.",
+    "aiFailed": "The AI request failed. Try again in a moment.",
+    "translateDone": "Translated. Please review the other languages before saving.",
+    "verifyDone": "Research done: {count} source(s) and tags added. Review them before saving.",
+    "aiSuggestedVerdict": "AI-suggested verdict",
+    "aiApplyVerdict": "Use this verdict",
+    "aiVerdictApplied": "Verdict selected"
   },
   "common": {
     "language": {

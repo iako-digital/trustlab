@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, type FormEvent } from "react";
+import { Languages, Search, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -46,6 +47,9 @@ export function ClaimForm({
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const [aiBusy, setAiBusy] = useState<"translate" | "verify" | null>(null);
+  const [aiNote, setAiNote] = useState<{ ok: boolean; text: string } | null>(null);
+  const [suggestion, setSuggestion] = useState<{ verdict: Verdict; summary: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   // A published claim must keep a verdict; a pending one may be saved without.
@@ -53,6 +57,89 @@ export function ClaimForm({
 
   const setLoc = (key: "title" | "claim" | "explanation", l: Locale, value: string) =>
     setV((p) => ({ ...p, [key]: { ...p[key], [l]: value } }));
+
+  /** POSTs to an admin AI route. Never saves anything: results only fill the form. */
+  async function callAi<T>(path: string, body: unknown): Promise<T | null> {
+    try {
+      const res = await fetch(path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const j = (await res.json().catch(() => ({}))) as T & { code?: string };
+      if (res.ok) return j;
+      setAiNote({
+        ok: false,
+        text: j.code === "not_configured" ? t("admin.aiNotConfigured") : res.status === 429 ? t("admin.aiTooMany") : t("admin.aiFailed"),
+      });
+    } catch {
+      setAiNote({ ok: false, text: t("admin.aiFailed") });
+    }
+    return null;
+  }
+
+  const aiInput = () => ({
+    from: v.sourceLang,
+    title: v.title[v.sourceLang],
+    claim: v.claim[v.sourceLang],
+    explanation: v.explanation[v.sourceLang],
+  });
+  const aiReady = () => {
+    const ok = v.title[v.sourceLang].trim() !== "" && v.claim[v.sourceLang].trim() !== "";
+    if (!ok) setAiNote({ ok: false, text: t("admin.aiNeedSource", { lang: v.sourceLang.toUpperCase() }) });
+    return ok;
+  };
+
+  const autoTranslate = async () => {
+    if (aiBusy || !aiReady()) return;
+    setAiBusy("translate");
+    setAiNote(null);
+    const j = await callAi<{ translations: Partial<Record<Locale, Record<"title" | "claim" | "explanation", string>>> }>(
+      "/api/admin/translate",
+      aiInput(),
+    );
+    if (j) {
+      setV((p) => {
+        const next = { ...p, title: { ...p.title }, claim: { ...p.claim }, explanation: { ...p.explanation } };
+        for (const l of LOCALES) {
+          const tr = j.translations[l];
+          if (!tr || l === p.sourceLang) continue;
+          next.title[l] = tr.title;
+          next.claim[l] = tr.claim;
+          next.explanation[l] = tr.explanation;
+        }
+        return next;
+      });
+      setAiNote({ ok: true, text: t("admin.translateDone") });
+    }
+    setAiBusy(null);
+  };
+
+  const verifyWithAi = async () => {
+    if (aiBusy || !aiReady()) return;
+    setAiBusy("verify");
+    setAiNote(null);
+    setSuggestion(null);
+    const j = await callAi<{ verdict: Verdict; summary: string; tags: string[]; sources: string[] }>(
+      "/api/admin/verify-agent",
+      aiInput(),
+    );
+    if (j) {
+      // Sources and tags are merged into the editable fields. The verdict is only
+      // proposed: choosing it (and saving) is the human decision that publishes.
+      setSourcesText((cur) => {
+        const have = cur.split("\n").map((x) => x.trim()).filter(Boolean);
+        return [...new Set([...have, ...j.sources])].slice(0, 20).join("\n");
+      });
+      setTagsText((cur) => {
+        const have = cur.split(",").map((x) => x.trim()).filter(Boolean);
+        return [...new Set([...have, ...j.tags])].slice(0, 10).join(", ");
+      });
+      setSuggestion({ verdict: j.verdict, summary: j.summary });
+      setAiNote({ ok: true, text: t("admin.verifyDone", { count: j.sources.length }) });
+    }
+    setAiBusy(null);
+  };
 
   const upload = async (file: File | undefined) => {
     if (!file) return;
@@ -144,6 +231,53 @@ export function ClaimForm({
             ))}
           </Select>
         </div>
+      </div>
+
+      <div className="space-y-3 rounded-2xl border border-dashed border-brand/40 bg-paper p-3">
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <Button type="button" variant="outline" size="sm" disabled={aiBusy !== null} onClick={autoTranslate}>
+            <Languages className="h-4 w-4" />
+            {aiBusy === "translate" ? t("admin.aiBusy") : t("admin.autoTranslate")}
+          </Button>
+          <Button type="button" variant="outline" size="sm" disabled={aiBusy !== null} onClick={verifyWithAi}>
+            <Search className="h-4 w-4" />
+            {aiBusy === "verify" ? t("admin.verifyBusy") : t("admin.verifyWithAi")}
+          </Button>
+        </div>
+        <p className="text-[11px] leading-snug text-ink-faint">
+          <Sparkles className="mr-1 inline h-3 w-3" />
+          {t("admin.aiDraftNote", { lang: v.sourceLang.toUpperCase() })}
+        </p>
+        {aiNote && (
+          <p
+            role={aiNote.ok ? "status" : "alert"}
+            className={aiNote.ok ? "text-xs text-verdict-trueink" : "text-xs text-verdict-fakeink"}
+          >
+            {aiNote.text}
+          </p>
+        )}
+        {suggestion && (
+          <div className="rounded-xl border border-paper-line bg-paper-card p-3 text-sm">
+            <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-ink-faint">
+              {t("admin.aiSuggestedVerdict")}: <span className="font-semibold text-ink">{t(`status.${suggestion.verdict}`)}</span>
+            </p>
+            {suggestion.summary && (
+              <p className="mt-1.5 whitespace-pre-wrap break-words text-xs leading-relaxed text-ink-soft">
+                {suggestion.summary}
+              </p>
+            )}
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="mt-2"
+              disabled={v.verdict === suggestion.verdict}
+              onClick={() => setV((p) => ({ ...p, verdict: suggestion.verdict }))}
+            >
+              {v.verdict === suggestion.verdict ? t("admin.aiVerdictApplied") : t("admin.aiApplyVerdict")}
+            </Button>
+          </div>
+        )}
       </div>
 
       {LOCALES.map((l) => (
