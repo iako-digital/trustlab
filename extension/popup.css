@@ -11,3 +11,16 @@ button:focus-visible, input:focus-visible { outline: 2px solid #2563eb; outline-
 #check { margin-bottom: 12px; padding: 8px; border: 1px solid #9aa4b2; border-radius: 8px; font-size: 13px; }
 #check blockquote { margin: 0 0 6px; font-style: italic; }
 #check p { margin: 0; font-weight: 600; }
+#check p.result { margin: 0; font-weight: 600; }
+.ai-card { margin-top: 4px; }
+.ai-eyebrow { margin: 0 0 6px; font: 600 11px/1 system-ui, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: #5b6b82; }
+.ai-verdict { display: inline-block; padding: 3px 10px; border-radius: 999px; font-weight: 700; font-size: 12px; color: #fff; }
+.ai-true { background: #047857; }
+.ai-fake { background: #b91c1c; }
+.ai-manipulative { background: #b45309; }
+.ai-unverified { background: #475569; }
+.ai-summary { margin: 8px 0 0; font-weight: 400; font-size: 13px; line-height: 1.45; }
+.ai-sources-title { margin: 10px 0 4px; font-size: 11px; font-weight: 700; color: #5b6b82; }
+.ai-sources { margin: 0; padding-left: 16px; font-size: 12px; font-weight: 400; }
+.ai-sources a { color: #2563eb; word-break: break-word; }
+.ai-note { margin: 8px 0 0; font-size: 10px; font-weight: 400; color: #5b6b82; }

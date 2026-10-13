@@ -36,25 +36,57 @@ $("refresh").addEventListener("click", () => {
 });
 
 // Result of the last right-click "Check with TrustLab".
+const AI_LABEL = { TRUE: "TRUE", FAKE: "FAKE", MANIPULATIVE: "MANIPULATIVE", UNVERIFIED: "UNVERIFIED" };
+
+function el(tag, cls, text) {
+  const n = document.createElement(tag);
+  if (cls) n.className = cls;
+  if (text != null) n.textContent = text;
+  return n;
+}
+
+function renderAi(box, ai) {
+  const card = el("div", "ai-card");
+  card.append(el("p", "ai-eyebrow", "AI Live Fact-Check"));
+  card.append(el("span", `ai-verdict ai-${ai.verdict.toLowerCase()}`, AI_LABEL[ai.verdict]));
+  if (ai.summary) card.append(el("p", "ai-summary", ai.summary));
+  if (ai.sources.length) {
+    card.append(el("p", "ai-sources-title", "Verified Sources / \u10EC\u10E7\u10D0\u10E0\u10DD\u10D4\u10D1\u10D8:"));
+    const list = el("ul", "ai-sources");
+    for (const s of ai.sources) {
+      const a = el("a", null, s.title);
+      a.href = s.url;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      const li = el("li");
+      li.append(a);
+      list.append(li);
+    }
+    card.append(list);
+  }
+  card.append(el("p", "ai-note", "AI result from live web search. Not a TrustLab editorial verdict."));
+  box.append(card);
+}
+
 chrome.storage.local.get("lastCheck", ({ lastCheck }) => {
   chrome.action.setBadgeText({ text: "" });
   if (!lastCheck) return;
   const box = $("check");
-  const quote = document.createElement("blockquote");
-  quote.textContent = `“${lastCheck.text}”`;
-  const result = document.createElement("p");
-  box.append(quote, result);
-  if (lastCheck.error) {
-    result.textContent = "Could not reach the TrustLab site.";
-  } else if (lastCheck.match) {
+  box.append(el("blockquote", null, `\u201c${lastCheck.text}\u201d`));
+
+  if (lastCheck.match) {
     const t = lastCheck.match.title || {};
-    const a = document.createElement("a");
+    const a = el("a", null, t.en || t.ka || t.hy || "View fact-check");
     a.href = `${lastCheck.baseUrl}/claim/${lastCheck.match.id}`;
     a.target = "_blank";
-    a.textContent = t.en || t.ka || t.hy || "View fact-check";
+    a.rel = "noopener noreferrer";
+    const result = el("p", "result");
     result.append(`Match (${lastCheck.match.status}): `, a);
+    box.append(result);
+  } else if (lastCheck.ai) {
+    renderAi(box, lastCheck.ai);
   } else {
-    result.textContent = "No matching fact-check found.";
+    box.append(el("p", "result", "Could not reach the TrustLab site."));
   }
   box.hidden = false;
 });

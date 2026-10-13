@@ -6,7 +6,7 @@ import { normalizeHttpUrl } from "@/lib/validation";
 export type ToolError = "not_configured" | "upstream";
 type Out<T> = { ok: true; value: T } | { ok: false; error: ToolError };
 
-interface GeminiPayload {
+export interface GeminiPayload {
   candidates?: {
     content?: { parts?: { text?: string }[] };
     groundingMetadata?: { groundingChunks?: { web?: { uri?: string; title?: string } }[] };
@@ -15,7 +15,7 @@ interface GeminiPayload {
 
 const LANG_NAME: Record<Locale, string> = { ka: "Georgian", hy: "Armenian", en: "English" };
 
-async function run(body: unknown, tag: string): Promise<GeminiPayload | null> {
+export async function run(body: unknown, tag: string): Promise<GeminiPayload | null> {
   const { res, failures } = await geminiText(body);
   if (!res || !res.ok) {
     console.error(`[${tag}] Gemini request failed:`, failures);
@@ -24,11 +24,11 @@ async function run(body: unknown, tag: string): Promise<GeminiPayload | null> {
   return (await res.json().catch(() => null)) as GeminiPayload | null;
 }
 
-const textOf = (p: GeminiPayload) =>
+export const textOf = (p: GeminiPayload) =>
   (p.candidates?.[0]?.content?.parts ?? []).map((x) => x.text ?? "").join("");
 
 /** Models sometimes wrap JSON in prose or code fences; take the outermost object. */
-function parseJsonObject(raw: string): Record<string, unknown> | null {
+export function parseJsonObject(raw: string): Record<string, unknown> | null {
   const a = raw.indexOf("{");
   const b = raw.lastIndexOf("}");
   if (a < 0 || b <= a) return null;
@@ -119,7 +119,7 @@ export interface VerifyResult {
 }
 
 /** Grounding links are Google redirect URLs; resolve to the publisher's real address when possible. */
-async function resolveRedirect(uri: string): Promise<string> {
+export async function resolveRedirect(uri: string): Promise<string> {
   if (!/^https:\/\/vertexaisearch\.cloud\.google\.com\//.test(uri)) return uri;
   try {
     const res = await fetch(uri, { redirect: "manual", signal: AbortSignal.timeout(5000) });

@@ -68,27 +68,68 @@ chrome.runtime.onInstalled.addListener(() => {
   });
 });
 
+// Badge per AI verdict: green check, red cross, amber exclamation, grey question mark.
+const AI_BADGE = {
+  TRUE: ["\u2713", "#15803d"],
+  FAKE: ["\u2717", "#b91c1c"],
+  MANIPULATIVE: ["!", "#d97706"],
+  UNVERIFIED: ["?", "#6b7280"],
+};
+
+function setBadge(text, color) {
+  chrome.action.setBadgeBackgroundColor({ color });
+  chrome.action.setBadgeText({ text });
+}
+
+// No published claim matched: ask the site for a live, search-grounded AI check.
+async function realtimeCheck(baseUrl, text) {
+  const res = await fetch(`${baseUrl}/api/verify-realtime`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text }),
+  });
+  if (!res.ok) throw new Error(`verify-realtime ${res.status}`);
+  const j = await res.json();
+  if (!AI_BADGE[j.verdict]) throw new Error("bad verdict");
+  return {
+    verdict: j.verdict,
+    summary: String(j.summary || ""),
+    sources: (Array.isArray(j.sources) ? j.sources : [])
+      .filter((s) => s && /^https?:\/\//.test(s.url))
+      .slice(0, 5)
+      .map((s) => ({ title: String(s.title || s.url).slice(0, 120), url: s.url })),
+  };
+}
+
 chrome.contextMenus.onClicked.addListener(async (info) => {
   if (info.menuItemId !== "trustlab-check") return;
   const text = (info.selectionText || "").trim();
   if (!text) return;
-  let check;
+  const { baseUrl } = await getSettings();
+  const check = { text: text.slice(0, 300), at: Date.now(), baseUrl, match: null };
+
   try {
-    const { baseUrl } = await getSettings();
     const { buildIndex, findMatch } = self.TrustLabMatcher;
     const match = findMatch(buildIndex(await loadClaims(false)), text);
-    check = {
-      text: text.slice(0, 300),
-      at: Date.now(),
-      baseUrl,
-      match: match ? { id: match.id, status: match.status, title: match.title } : null,
-    };
+    if (match) check.match = { id: match.id, status: match.status, title: match.title };
   } catch (e) {
-    check = { text: text.slice(0, 300), at: Date.now(), error: String(e) };
+    check.error = String(e); // local claims unavailable: still try the live check below
   }
+
+  if (check.match) {
+    setBadge("\u2713", "#15803d");
+  } else {
+    setBadge("\u2026", "#6b7280");
+    try {
+      check.ai = await realtimeCheck(baseUrl, text);
+      setBadge(...AI_BADGE[check.ai.verdict]);
+    } catch (e) {
+      check.aiError = String(e);
+      setBadge("!", "#b91c1c");
+    }
+  }
+
   await chrome.storage.local.set({ lastCheck: check });
-  chrome.action.setBadgeBackgroundColor({ color: check.error ? "#b91c1c" : check.match ? "#15803d" : "#6b7280" });
-  chrome.action.setBadgeText({ text: check.error ? "!" : check.match ? "✓" : "?" });
   try {
     await chrome.action.openPopup(); // needs a recent Chrome; the badge is the fallback
   } catch {}
