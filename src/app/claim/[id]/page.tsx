@@ -63,10 +63,23 @@ export default function ClaimDetailPage() {
         )}
       </div>
 
+      {claim.coverImageUrl && (
+        <div className="mt-5 aspect-[16/9] w-full overflow-hidden rounded-2xl border border-paper-line bg-paper-tint">
+          {/* eslint-disable-next-line @next/next/no-img-element -- remote cover URLs; plain img keeps hostnames unrestricted */}
+          <img
+            src={claim.coverImageUrl}
+            alt=""
+            decoding="async"
+            referrerPolicy="no-referrer"
+            className="h-full w-full object-cover"
+          />
+        </div>
+      )}
+
       <div className="mt-4">
         <VerdictBadge status={claim.status} />
       </div>
-      <h1 className="mt-4 font-serif text-3xl font-semibold leading-tight text-ink sm:text-4xl">
+      <h1 className="mt-4 break-words font-serif text-2xl font-semibold leading-tight text-ink sm:text-4xl">
         {claim.title[locale]}
       </h1>
 
@@ -88,7 +101,7 @@ export default function ClaimDetailPage() {
       {/* The claim */}
       <section className="mt-8">
         <SectionLabel>{t("detail.theClaim")}</SectionLabel>
-        <blockquote className="border-l-2 border-verdict-manip/50 bg-verdict-manipbg/50 py-3 pl-4 pr-3 text-lg leading-relaxed text-ink">
+        <blockquote className="border-l-2 border-verdict-manip/50 bg-verdict-manipbg/50 py-3 pl-4 pr-3 break-words text-base leading-relaxed text-ink sm:text-lg">
           {claim.claim[locale]}
         </blockquote>
         {claim.sourceUrl && (
@@ -108,7 +121,7 @@ export default function ClaimDetailPage() {
       {claim.status !== "pending" && (
         <section className="mt-8">
           <SectionLabel>{t("detail.explanation")}</SectionLabel>
-          <div className="prose-editorial space-y-4 text-[17px] leading-[1.7] text-ink-soft">
+          <div className="prose-editorial space-y-4 break-words text-base leading-[1.7] sm:text-[17px] text-ink-soft">
             {(claim.explanation[locale] || claim.explanation[claim.sourceLang] || "")
               .split("\n")
               .filter(Boolean)

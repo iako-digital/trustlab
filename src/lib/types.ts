@@ -36,6 +36,8 @@ export interface Claim {
   sources: string[];
   /** Free-form topic tags (lowercase). */
   tags?: string[];
+  /** Optional cover image (http/https URL). */
+  coverImageUrl?: string;
   verifiedBy?: string;
   submittedAt: string; // ISO date
   verifiedAt?: string; // ISO date

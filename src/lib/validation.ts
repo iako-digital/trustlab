@@ -187,6 +187,7 @@ export interface ClaimInput {
   sourceUrl: string | null;
   sources: string[];
   tags: string[];
+  coverImageUrl: string | null;
   /** null = keep/save as pending. */
   verdict: Verdict | null;
 }
@@ -244,6 +245,12 @@ export function parseClaimInput(body: unknown): Result<ClaimInput> {
     sources.push(u);
   }
 
+  let coverImageUrl: string | null = null;
+  if (b.coverImageUrl != null && b.coverImageUrl !== "") {
+    coverImageUrl = normalizeHttpUrl(b.coverImageUrl);
+    if (!coverImageUrl) return { ok: false, error: "coverImageUrl" };
+  }
+
   const rawTags = Array.isArray(b.tags) ? b.tags : [];
   const tags = [
     ...new Set(
@@ -257,6 +264,6 @@ export function parseClaimInput(body: unknown): Result<ClaimInput> {
 
   return {
     ok: true,
-    value: { title, claim, explanation, category, sourceLang, sourceUrl, sources, tags, verdict },
+    value: { title, claim, explanation, category, sourceLang, sourceUrl, sources, tags, coverImageUrl, verdict },
   };
 }

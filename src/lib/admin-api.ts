@@ -40,6 +40,7 @@ export interface ClaimFormValue {
   sourceUrl: string;
   sources: string[];
   tags: string[];
+  coverImageUrl: string;
   verdict: Verdict | null;
 }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,6 +22,7 @@ function initial(claim?: Claim): ClaimFormValue {
     sourceUrl: claim?.sourceUrl ?? "",
     sources: claim?.sources ?? [],
     tags: claim?.tags ?? [],
+    coverImageUrl: claim?.coverImageUrl ?? "",
     verdict: claim && claim.status !== "pending" ? claim.status : null,
   };
 }
@@ -42,6 +43,9 @@ export function ClaimForm({
   const [sourcesText, setSourcesText] = useState((claim?.sources ?? []).join("\n"));
   const [tagsText, setTagsText] = useState((claim?.tags ?? []).join(", "));
   const [busy, setBusy] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
 
   // A published claim must keep a verdict; a pending one may be saved without.
@@ -49,6 +53,24 @@ export function ClaimForm({
 
   const setLoc = (key: "title" | "claim" | "explanation", l: Locale, value: string) =>
     setV((p) => ({ ...p, [key]: { ...p[key], [l]: value } }));
+
+  const upload = async (file: File | undefined) => {
+    if (!file) return;
+    setUploading(true);
+    setUploadError(null);
+    try {
+      const body = new FormData();
+      body.append("file", file);
+      const res = await fetch("/api/admin/upload", { method: "POST", body });
+      const j = (await res.json().catch(() => ({}))) as { url?: string; code?: string };
+      if (res.ok && j.url) setV((p) => ({ ...p, coverImageUrl: j.url! }));
+      else setUploadError(j.code === "migration_missing" ? t("admin.migrationMissing") : t("admin.coverUploadFailed"));
+    } catch {
+      setUploadError(t("admin.coverUploadFailed"));
+    }
+    setUploading(false);
+    if (fileRef.current) fileRef.current.value = "";
+  };
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
@@ -153,6 +175,54 @@ export function ClaimForm({
         </fieldset>
       ))}
 
+      <div>
+        <Label htmlFor="cf-cover">{t("admin.coverImage")}</Label>
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <Input
+            id="cf-cover"
+            type="url"
+            placeholder={t("admin.coverImageUrl")}
+            value={v.coverImageUrl}
+            onChange={(e) => setV({ ...v, coverImageUrl: e.target.value })}
+          />
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            className="sr-only"
+            tabIndex={-1}
+            aria-label={t("admin.coverUpload")}
+            onChange={(e) => upload(e.target.files?.[0])}
+          />
+          <Button
+            type="button"
+            variant="ghost"
+            className="shrink-0"
+            disabled={uploading}
+            onClick={() => fileRef.current?.click()}
+          >
+            {uploading ? t("admin.coverUploading") : t("admin.coverUpload")}
+          </Button>
+        </div>
+        {uploadError && (
+          <p role="alert" className="mt-1 text-xs text-verdict-fakeink">
+            {uploadError}
+          </p>
+        )}
+        {v.coverImageUrl && (
+          <div className="mt-2 flex items-start gap-3">
+            {/* eslint-disable-next-line @next/next/no-img-element -- admin preview of an arbitrary remote URL */}
+            <img
+              src={v.coverImageUrl}
+              alt=""
+              className="h-24 w-40 rounded-xl border border-paper-line object-cover"
+            />
+            <Button type="button" variant="ghost" onClick={() => setV({ ...v, coverImageUrl: "" })}>
+              {t("admin.coverRemove")}
+            </Button>
+          </div>
+        )}
+      </div>
       <div>
         <Label htmlFor="cf-url">{t("admin.fieldSourceUrl")}</Label>
         <Input

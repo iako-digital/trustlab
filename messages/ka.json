@@ -152,7 +152,13 @@
     "tags": "თეგები",
     "tagsHelp": "მძიმით გამოყოფილი, მაგ. history, viral-video",
     "formInvalid": "ზოგი ველი არასწორია ან ცარიელია: სამივე სათაური და მტკიცება სავალდებულოა, ვერდიქტს კი განმარტება სჭირდება საწყის ენაზე.",
-    "migrationMissing": "ბაზას აკლია მიგრაცია 0004 (supabase/migrations/0004_claim_crud_and_tags.sql). გაუშვით Supabase SQL რედაქტორში."
+    "migrationMissing": "ბაზას აკლია მიგრაციები 0004 და 0005 (supabase/migrations). გაუშვით Supabase SQL რედაქტორში.",
+    "coverImage": "გარეკანის სურათი",
+    "coverImageUrl": "სურათის ბმული (https://…)",
+    "coverUpload": "სურათის ატვირთვა",
+    "coverUploading": "იტვირთება…",
+    "coverRemove": "სურათის წაშლა",
+    "coverUploadFailed": "ატვირთვა ვერ მოხერხდა. გამოიყენეთ JPEG, PNG ან WebP, მაქს. 3 მბ."
   },
   "common": {
     "language": {
@@ -276,6 +282,7 @@
     "busy": "ასისტენტი ახლა ძალიან დატვირთულია. სცადეთ ცოტა ხანში."
   },
   "social": {
-    "facebook": "TrustLab Facebook-ზე"
+    "facebook": "TrustLab Facebook-ზე",
+    "instagram": "TrustLab Instagram-ზე"
   }
 }

@@ -17,6 +17,19 @@ export function ClaimCard({ claim }: { claim: Claim }) {
 
   return (
     <Card className="group flex flex-col transition-shadow hover:shadow-[0_2px_4px_rgba(15,27,45,0.06),0_16px_40px_-16px_rgba(15,27,45,0.22)]">
+      {claim.coverImageUrl && (
+        <div className="aspect-[16/9] w-full overflow-hidden border-b border-paper-line bg-paper-tint">
+          {/* eslint-disable-next-line @next/next/no-img-element -- remote cover URLs; plain img keeps hostnames unrestricted */}
+          <img
+            src={claim.coverImageUrl}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            referrerPolicy="no-referrer"
+            className="h-full w-full object-cover"
+          />
+        </div>
+      )}
       {/* Case-file meta line */}
       <div className="flex items-center justify-between border-b border-paper-line px-5 py-2.5 font-mono text-[11px] uppercase tracking-[0.12em] text-ink-faint">
         <span className="flex items-center gap-1.5">
@@ -29,7 +42,7 @@ export function ClaimCard({ claim }: { claim: Claim }) {
       <div className="flex flex-1 flex-col p-5">
         <VerdictBadge status={claim.status} className="mb-3 self-start" />
         <Link href={`/claim/${claim.id}`} className="block">
-          <h3 className="font-serif text-lg font-semibold leading-snug text-ink group-hover:text-brand">
+          <h3 className="break-words font-serif text-lg font-semibold leading-snug text-ink group-hover:text-brand">
             {claim.title[locale]}
           </h3>
         </Link>
@@ -63,7 +76,7 @@ export function ClaimCard({ claim }: { claim: Claim }) {
           </span>
           <Link
             href={`/claim/${claim.id}`}
-            className="inline-flex items-center gap-1 text-sm font-medium text-brand hover:gap-1.5"
+            className="inline-flex min-h-10 items-center gap-1 text-sm font-medium text-brand hover:gap-1.5 sm:min-h-0"
           >
             {t("card.readMore")}
             <ArrowRight className="h-3.5 w-3.5 transition-all" />

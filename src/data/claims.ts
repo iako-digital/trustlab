@@ -11,6 +11,7 @@ export const SEED_CLAIMS: Claim[] = [
   // ------------------------------------------------------------------ FAKE
   {
     id: "c_border_video",
+    coverImageUrl: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80",
     title: {
       ka: "ვიდეო ამტკიცებს, რომ სასაზღვრო გამშვები პუნქტი კვლავ გაიხსნა",
       hy: "Տեսանյութը պնդում է, որ սահմանային անցակետը վերաբացվել է",
@@ -39,6 +40,7 @@ export const SEED_CLAIMS: Claim[] = [
   },
   {
     id: "c_history_map",
+    coverImageUrl: "https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?auto=format&fit=crop&w=1200&q=80",
     title: {
       ka: "„ისტორიული რუკა“ ვითომ ამტკიცებს უძველეს საზღვრებს",
       hy: "«Պատմական քարտեզը» իբր ապացուցում է հնագույն սահմանները",
@@ -67,6 +69,7 @@ export const SEED_CLAIMS: Claim[] = [
   },
   {
     id: "c_water_alert",
+    coverImageUrl: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1200&q=80",
     title: {
       ka: "გაყალბებული შეტყობინება „წყალი დაბინძურებულია“",
       hy: "Կեղծ հաղորդագրություն՝ «ջուրը աղտոտված է»",
@@ -95,6 +98,7 @@ export const SEED_CLAIMS: Claim[] = [
   // ---------------------------------------------------------- MANIPULATIVE
   {
     id: "c_old_photo",
+    coverImageUrl: "https://images.unsplash.com/photo-1461360370896-922624d12aa1?auto=format&fit=crop&w=1200&q=80",
     title: {
       ka: "ძველი ფოტო გასაღდა როგორც გუშინდელი აქცია",
       hy: "Հին լուսանկարը ներկայացվել է որպես երեկվա ցույց",
@@ -123,6 +127,7 @@ export const SEED_CLAIMS: Claim[] = [
   },
   {
     id: "c_pension_law",
+    coverImageUrl: "https://images.unsplash.com/photo-1565688534245-05d6b5be184a?auto=format&fit=crop&w=1200&q=80",
     title: {
       ka: "„პენსიები განახევრდება“ — რა თქვა კანონმა სინამდვილეში",
       hy: "«Թոշակները կկիսվեն»՝ ինչ է իրականում ասում օրենքը",
@@ -150,6 +155,7 @@ export const SEED_CLAIMS: Claim[] = [
   },
   {
     id: "c_unemployment_stat",
+    coverImageUrl: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80",
     title: {
       ka: "„უმუშევრობა გაორმაგდა“ — სტატისტიკა კონტექსტის გარეშე",
       hy: "«Գործազրկությունը կրկնապատկվել է»՝ վիճակագրություն առանց համատեքստի",
@@ -178,6 +184,7 @@ export const SEED_CLAIMS: Claim[] = [
   // ------------------------------------------------------------------ TRUE
   {
     id: "c_transit_pilot",
+    coverImageUrl: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80",
     title: {
       ka: "საზოგადოებრივი ტრანსპორტის უფასო გადაჯდომის საპილოტე პროგრამა",
       hy: "Հանրային տրանսպորտի անվճար փոխանցման փորձնական ծրագիր",
@@ -205,6 +212,7 @@ export const SEED_CLAIMS: Claim[] = [
   },
   {
     id: "c_student_exchange",
+    coverImageUrl: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80",
     title: {
       ka: "უნივერსიტეტებს შორის სტუდენტური გაცვლის ახალი პროგრამა",
       hy: "Համալսարանների միջև ուսանողական փոխանակման նոր ծրագիր",
@@ -233,6 +241,7 @@ export const SEED_CLAIMS: Claim[] = [
   },
   {
     id: "c_archive_digitized",
+    coverImageUrl: "https://images.unsplash.com/photo-1457369804613-52c61a468e7d?auto=format&fit=crop&w=1200&q=80",
     title: {
       ka: "ისტორიული დოკუმენტების ციფრული არქივი ონლაინ ხელმისაწვდომია",
       hy: "Պատմական փաստաթղթերի թվային արխիվը հասանելի է առցանց",
@@ -262,6 +271,7 @@ export const SEED_CLAIMS: Claim[] = [
   // --------------------------------------------------------------- PENDING
   {
     id: "c_pending_quote",
+    coverImageUrl: "https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=1200&q=80",
     title: {
       ka: "ციტატა, რომელიც ვითომ ცნობილ მოღვაწეს ეკუთვნის",
       hy: "Մեջբերում, որը իբր հայտնի գործչի է",
@@ -283,6 +293,7 @@ export const SEED_CLAIMS: Claim[] = [
   },
   {
     id: "c_pending_checkpoint",
+    coverImageUrl: "https://images.unsplash.com/photo-1544027993-37dbfe43562a?auto=format&fit=crop&w=1200&q=80",
     title: {
       ka: "პოსტი სასაზღვრო პუნქტზე მოსალოდნელი ცვლილების შესახებ",
       hy: "Գրառում սահմանային անցակետում սպասվող փոփոխության մասին",

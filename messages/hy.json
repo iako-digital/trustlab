@@ -152,7 +152,13 @@
     "tags": "Պիտակներ",
     "tagsHelp": "ստորակետով, օր. history, viral-video",
     "formInvalid": "Որոշ դաշտեր սխալ են կամ դատարկ. երեք վերնագրերը և պնդումները պարտադիր են, իսկ վճռին անհրաժեշտ է բացատրություն սկզբնաղբյուրի լեզվով։",
-    "migrationMissing": "Տվյալների բազայում բացակայում է 0004 միգրացիան (supabase/migrations/0004_claim_crud_and_tags.sql)։ Գործարկեք Supabase SQL խմբագրիչում։"
+    "migrationMissing": "Տվյալների բազայում բացակայում են 0004 և 0005 միգրացիաները (supabase/migrations)։ Գործարկեք Supabase SQL խմբագրիչում։",
+    "coverImage": "Շապիկի պատկեր",
+    "coverImageUrl": "Պատկերի հղում (https://…)",
+    "coverUpload": "Վերբեռնել պատկեր",
+    "coverUploading": "Վերբեռնվում է…",
+    "coverRemove": "Հեռացնել պատկերը",
+    "coverUploadFailed": "Վերբեռնումը ձախողվեց։ Օգտագործեք JPEG, PNG կամ WebP՝ մինչև 3 ՄԲ։"
   },
   "common": {
     "language": {
@@ -276,6 +282,7 @@
     "busy": "Օգնականը այս պահին շատ ծանրաբեռնված է։ Փորձեք քիչ անց։"
   },
   "social": {
-    "facebook": "TrustLab-ը Facebook-ում"
+    "facebook": "TrustLab-ը Facebook-ում",
+    "instagram": "TrustLab-ը Instagram-ում"
   }
 }

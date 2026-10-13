@@ -79,7 +79,7 @@ export function ClaimEditor({
     <div className="rounded-2xl border border-paper-line bg-paper-card shadow-card transform transition-smooth hover:-translate-y-1">
       {/* Submitted content */}
       <div className="border-b border-paper-line p-5">
-        <div className="mb-2 flex items-center justify-between font-mono text-[11px] uppercase tracking-[0.12em] text-ink-faint">
+        <div className="mb-2 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 font-mono text-[11px] uppercase tracking-[0.12em] text-ink-faint">
           <span>
             {t(`category.${claim.category}`)} · {claim.sourceLang.toUpperCase()} ·{" "}
             {t(`submit.type${cap(claim.submissionType)}`)}
@@ -193,7 +193,7 @@ export function ClaimEditor({
             </div>
           </div>
         ) : (
-          <div className="flex items-center justify-between gap-3 pt-1">
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
             <Button
               variant="ghost"
               size="sm"

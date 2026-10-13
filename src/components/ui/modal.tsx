@@ -33,7 +33,7 @@ export function Modal({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4">
       <div
         className="absolute inset-0 bg-ink/50 backdrop-blur-sm animate-fade-in"
         onClick={onClose}
@@ -44,14 +44,14 @@ export function Modal({
         aria-modal="true"
         aria-label={title}
         className={cn(
-          "relative w-full max-w-md animate-pop-in rounded-card border border-paper-line bg-paper-card p-6 shadow-card",
+          "relative max-h-[calc(100dvh-1rem)] w-full max-w-md animate-pop-in overflow-y-auto rounded-card border border-paper-line bg-paper-card p-4 shadow-card sm:max-h-[calc(100dvh-2rem)] sm:p-6",
           className,
         )}
       >
         <button
           onClick={onClose}
           aria-label="Close"
-          className="absolute right-4 top-4 rounded-full p-1.5 text-ink-faint transition-smooth hover:bg-paper hover:text-ink"
+          className="absolute right-2 top-2 rounded-full p-2.5 sm:right-4 sm:top-4 sm:p-1.5 text-ink-faint transition-smooth hover:bg-paper hover:text-ink"
         >
           <X className="h-4 w-4" />
         </button>

@@ -4,6 +4,7 @@ import { Providers } from "./providers";
 import { Navbar } from "@/components/navbar";
 import { Logo } from "@/components/logo";
 import { FacebookLink } from "@/components/facebook-link";
+import { InstagramLink } from "@/components/instagram-link";
 
 export const metadata: Metadata = {
   title: "TrustLab — Fact-checking regional disinformation",
@@ -58,11 +59,12 @@ function Footer() {
           <Logo markClassName="h-7" />
           <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-ink-faint">Prototype</span>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
           <p className="text-xs text-ink-faint">
             Crowdsourced fact-checking · ka · hy · en
           </p>
           <FacebookLink />
+          <InstagramLink />
         </div>
       </div>
     </footer>

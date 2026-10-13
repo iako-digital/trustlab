@@ -17,7 +17,7 @@ export function FacebookLink({ className }: { className?: string }) {
       aria-label={t("social.facebook")}
       title={t("social.facebook")}
       className={cn(
-        "inline-flex h-9 w-9 items-center justify-center rounded-full text-ink-soft transition-smooth hover:-translate-y-0.5 hover:bg-paper-tint hover:text-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand",
+        "inline-flex h-10 w-10 items-center sm:h-9 sm:w-9 justify-center rounded-full text-ink-soft transition-smooth hover:-translate-y-0.5 hover:bg-paper-tint hover:text-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand",
         className,
       )}
     >

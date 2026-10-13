@@ -152,7 +152,13 @@
     "tags": "Tags",
     "tagsHelp": "comma separated, e.g. history, viral-video",
     "formInvalid": "Some fields are invalid or missing: all three titles and claims are required, and a verdict needs an explanation in the source language.",
-    "migrationMissing": "The database is missing migration 0004 (supabase/migrations/0004_claim_crud_and_tags.sql). Run it in the Supabase SQL editor."
+    "migrationMissing": "The database is missing migrations 0004 and 0005 (supabase/migrations). Run them in the Supabase SQL editor.",
+    "coverImage": "Cover image",
+    "coverImageUrl": "Image URL (https://…)",
+    "coverUpload": "Upload image",
+    "coverUploading": "Uploading…",
+    "coverRemove": "Remove image",
+    "coverUploadFailed": "Upload failed. Use a JPEG, PNG or WebP image under 3 MB."
   },
   "common": {
     "language": {
@@ -276,6 +282,7 @@
     "busy": "The assistant is very busy right now. Please try again in a moment."
   },
   "social": {
-    "facebook": "TrustLab on Facebook"
+    "facebook": "TrustLab on Facebook",
+    "instagram": "TrustLab on Instagram"
   }
 }

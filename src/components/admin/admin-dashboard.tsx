@@ -70,13 +70,13 @@ export function AdminDashboard() {
 
   return (
     <div>
-      <div className="mb-6 flex items-start justify-between gap-4">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="font-serif text-3xl font-semibold text-ink">{t("admin.title")}</h1>
+          <h1 className="font-serif text-2xl font-semibold text-ink sm:text-3xl">{t("admin.title")}</h1>
           <p className="mt-1 text-ink-soft">{t("admin.subtitle")}</p>
           {me && <p className="mt-1 font-mono text-[11px] text-ink-faint">{me}</p>}
         </div>
-        <div className="flex flex-wrap justify-end gap-2">
+        <div className="flex flex-wrap gap-2 sm:justify-end">
           <Button variant="brand" size="sm" onClick={() => setForm({})}>
             <Plus className="h-4 w-4" />
             {t("admin.newClaim")}
@@ -89,13 +89,13 @@ export function AdminDashboard() {
       </div>
 
       {/* Tabs */}
-      <div className="mb-6 flex gap-1 overflow-x-auto border-b border-paper-line">
+      <div className="-mx-5 mb-6 flex gap-1 overflow-x-auto border-b px-5 sm:mx-0 sm:px-0 border-b border-paper-line">
         {tabs.map((tb) => (
           <button
             key={tb.key}
             onClick={() => setTab(tb.key)}
             className={cn(
-              "relative -mb-px whitespace-nowrap border-b-2 px-4 py-2.5 text-sm font-medium transition-colors",
+              "relative -mb-px whitespace-nowrap border-b-2 px-3 py-3 text-sm font-medium transition-colors sm:px-4 sm:py-2.5",
               tab === tb.key
                 ? "border-ink text-ink"
                 : "border-transparent text-ink-faint hover:text-ink-soft",
@@ -214,7 +214,7 @@ export function AdminDashboard() {
         open={form !== null}
         onClose={() => setForm(null)}
         title={form?.claim ? t("admin.editClaim") : t("admin.newClaim")}
-        className="max-h-[90vh] max-w-2xl overflow-y-auto"
+        className="max-w-2xl"
       >
         {form && (
           <ClaimForm

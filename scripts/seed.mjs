@@ -38,6 +38,7 @@ const rows = SEED_CLAIMS.map((c) => {
     source_url: c.sourceUrl ?? null,
     sources: c.sources,
     tags: c.tags ?? [],
+    cover_image_url: c.coverImageUrl ?? null,
     verified_label: c.verifiedBy ?? null,
     verified_at: c.verifiedAt ?? null,
     submitted_at: c.submittedAt,
@@ -45,16 +46,20 @@ const rows = SEED_CLAIMS.map((c) => {
 });
 
 let { error } = await supabase.from("claims").upsert(rows, { onConflict: "seed_key" });
-if (error?.code === "PGRST204" || error?.code === "42703") {
-  // `tags` column missing: migration 0004 has not been applied. Seed without tags.
+const missingColumn = (e) => e?.code === "PGRST204" || e?.code === "42703";
+if (missingColumn(error)) {
+  // `cover_image_url` column missing: migration 0005 has not been applied. Seed without covers.
+  console.warn("Column claims.cover_image_url not found (run migration 0005 for covers); seeding without covers.");
+  ({ error } = await supabase
+    .from("claims")
+    .upsert(rows.map(({ cover_image_url, ...r }) => r), { onConflict: "seed_key" }));
+}
+if (missingColumn(error)) {
+  // `tags` column missing too: migration 0004 has not been applied. Seed without tags.
   console.warn("Column claims.tags not found (run migration 0004 for tags); seeding without tags.");
   ({ error } = await supabase
     .from("claims")
-    .upsert(rows.map((r) => {
-      const copy = { ...r };
-      delete copy.tags;
-      return copy;
-    }), { onConflict: "seed_key" }));
+    .upsert(rows.map(({ cover_image_url, tags, ...r }) => r), { onConflict: "seed_key" }));
 }
 if (error) {
   console.error("Seed failed:", error.message);

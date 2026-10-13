@@ -75,12 +75,12 @@ export function ChatWidget() {
   };
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-3 sm:bottom-6 sm:right-6">
+    <div className="fixed bottom-[max(1rem,env(safe-area-inset-bottom))] right-4 z-50 flex flex-col items-end gap-3 sm:bottom-6 sm:right-6">
       {open && (
         <div
           role="dialog"
           aria-label={t("chat.title")}
-          className="flex h-[min(32rem,calc(100vh-7rem))] w-[min(22rem,calc(100vw-2rem))] flex-col overflow-hidden rounded-2xl border border-paper-line bg-paper-card shadow-card"
+          className="flex h-[min(32rem,calc(100dvh-7rem))] w-[min(22rem,calc(100vw-2rem))] flex-col overflow-hidden rounded-2xl border border-paper-line bg-paper-card shadow-card"
         >
           <div className="flex items-center justify-between bg-ink px-4 py-3 text-paper">
             <div>
@@ -91,7 +91,7 @@ export function ChatWidget() {
               type="button"
               onClick={() => setOpen(false)}
               aria-label={t("chat.close")}
-              className="rounded-full p-1.5 hover:bg-paper/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-paper"
+              className="rounded-full p-2.5 hover:bg-paper/20 sm:p-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-paper"
             >
               <X className="h-4 w-4" />
             </button>
@@ -105,7 +105,7 @@ export function ChatWidget() {
               <div key={i} className={cn("flex", m.role === "user" ? "justify-end" : "justify-start")}>
                 <p
                   className={cn(
-                    "max-w-[85%] whitespace-pre-wrap rounded-2xl px-3 py-2 text-sm leading-relaxed",
+                    "max-w-[85%] whitespace-pre-wrap break-words rounded-2xl px-3 py-2 text-sm leading-relaxed",
                     m.role === "user" ? "bg-ink text-paper" : "bg-paper text-ink",
                   )}
                 >
@@ -129,13 +129,13 @@ export function ChatWidget() {
               maxLength={MAX_CHARS}
               placeholder={t("chat.placeholder")}
               aria-label={t("chat.placeholder")}
-              className="h-10 min-w-0 flex-1 rounded-2xl border border-paper-line bg-paper-card px-3 text-sm text-ink placeholder:text-ink-faint focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+              className="h-11 min-w-0 flex-1 rounded-2xl border border-paper-line bg-paper-card px-3 text-base sm:h-10 sm:text-sm text-ink placeholder:text-ink-faint focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
             />
             <button
               type="submit"
               disabled={busy || !input.trim()}
               aria-label={t("chat.send")}
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-ink text-paper hover:bg-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 disabled:opacity-50"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-ink sm:h-10 sm:w-10 text-paper hover:bg-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 disabled:opacity-50"
             >
               <Send className="h-4 w-4" />
             </button>
