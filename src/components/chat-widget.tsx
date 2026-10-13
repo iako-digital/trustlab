@@ -148,7 +148,7 @@ export function ChatWidget() {
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-label={open ? t("chat.close") : t("chat.open")}
-        className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-brand to-ink text-paper shadow-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
+        className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-brand to-brand-navy text-white shadow-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
       >
         {open ? <X className="h-6 w-6" /> : <MessageCircle className="h-6 w-6" />}
       </button>

@@ -35,7 +35,7 @@ export function ExtensionSection() {
         <div className="grid gap-0 lg:grid-cols-2">
           {/* Copy side */}
           <div className="p-6 sm:p-8">
-            <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-brand to-ink text-paper shadow-card glow-soft">
+            <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-brand to-brand-navy text-white shadow-card glow-soft">
               <Puzzle className="h-5 w-5" strokeWidth={2} />
             </span>
             <p className="mt-4 font-mono text-[11px] uppercase tracking-[0.16em] text-ink-faint">

@@ -5,6 +5,45 @@
 @layer base {
   :root {
     color-scheme: light;
+    --c-ink: 11 45 91;
+    --c-ink-soft: 31 41 55;
+    --c-ink-faint: 91 107 130;
+    --c-paper: 243 246 251;
+    --c-paper-card: 255 255 255;
+    --c-paper-line: 214 228 247;
+    --c-paper-tint: 230 241 255;
+    --c-fakeink: 185 28 28;
+    --c-fakebg: 254 240 240;
+    --c-manipink: 146 64 14;
+    --c-manipbg: 254 244 224;
+    --c-trueink: 4 120 87;
+    --c-truebg: 230 248 241;
+    --c-pending: 71 85 105;
+    --c-pendingbg: 230 241 255;
+    --c-brand: 37 99 235;
+  }
+  .dark {
+    color-scheme: dark;
+    --c-ink: 230 238 250;
+    --c-ink-soft: 197 209 227;
+    --c-ink-faint: 147 164 188;
+    --c-paper: 11 18 32;
+    --c-paper-card: 18 27 46;
+    --c-paper-line: 36 50 77;
+    --c-paper-tint: 23 37 64;
+    --c-fakeink: 252 165 165;
+    --c-fakebg: 42 22 24;
+    --c-manipink: 252 211 77;
+    --c-manipbg: 43 33 16;
+    --c-trueink: 110 231 183;
+    --c-truebg: 15 42 34;
+    --c-pending: 148 163 184;
+    --c-pendingbg: 23 37 64;
+    --c-brand: 59 130 246;
+  }
+  /* Smooth cross-fade when the theme is toggled (class is set briefly by ThemeToggle). */
+  .theme-fade, .theme-fade * {
+    transition: background-color 250ms ease, border-color 250ms ease, color 250ms ease !important;
   }
   html {
     -webkit-text-size-adjust: 100%;

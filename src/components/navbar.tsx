@@ -6,6 +6,7 @@ import { useT } from "@/lib/i18n";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { FacebookLink } from "@/components/facebook-link";
 import { InstagramLink } from "@/components/instagram-link";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const LINK =
   "rounded-2xl px-3 py-2.5 text-sm font-medium text-ink-soft hover:bg-paper-card hover:-translate-y-0.5 transition-smooth sm:py-2";
@@ -43,6 +44,7 @@ export function Navbar() {
           <div className="ml-1">
             <LanguageSwitcher />
           </div>
+          <ThemeToggle />
         </div>
       </div>
     </header>

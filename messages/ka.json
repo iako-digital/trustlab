@@ -303,5 +303,8 @@
   "social": {
     "facebook": "TrustLab Facebook-ზე",
     "instagram": "TrustLab Instagram-ზე"
+  },
+  "theme": {
+    "toggle": "ღია და მუქი თემის გადართვა"
   }
 }

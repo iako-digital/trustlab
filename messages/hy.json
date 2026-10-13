@@ -303,5 +303,8 @@
   "social": {
     "facebook": "TrustLab-ը Facebook-ում",
     "instagram": "TrustLab-ը Instagram-ում"
+  },
+  "theme": {
+    "toggle": "Փոխել բաց և մուգ թեմայի միջև"
   }
 }

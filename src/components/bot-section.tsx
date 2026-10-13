@@ -32,7 +32,7 @@ export function BotSection() {
       <Card className="p-6 sm:p-8">
         <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-4">
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-brand to-ink text-paper shadow-card glow-soft">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-brand to-brand-navy text-white shadow-card glow-soft">
               <Bot className="h-5 w-5" strokeWidth={2} />
             </span>
             <div>

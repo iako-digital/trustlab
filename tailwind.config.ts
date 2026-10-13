@@ -1,6 +1,10 @@
 import type { Config } from "tailwindcss";
 
+/** Colour defined as an `r g b` CSS variable (see globals.css) so it keeps alpha modifiers like bg-ink/50. */
+const v = (name: string) => `rgb(var(--c-${name}) / <alpha-value>)`;
+
 const config: Config = {
+  darkMode: "class",
   content: ["./src/**/*.{ts,tsx}"],
   theme: {
     container: {
@@ -12,32 +16,32 @@ const config: Config = {
       colors: {
         // Editorial "evidence desk" palette — ink + paper + a 3-verdict system.
         ink: {
-          DEFAULT: "#0B2D5B", // Navy: headings, primary buttons, dark surfaces
-          soft: "#1F2937", // Slate: body text
-          faint: "#5B6B82", // muted text (AA on white and on paper)
+          DEFAULT: v("ink"), // Navy: headings, primary buttons, dark surfaces
+          soft: v("ink-soft"), // Slate: body text
+          faint: v("ink-faint"), // muted text (AA on white and on paper)
         },
         paper: {
-          DEFAULT: "#F3F6FB", // page background
-          card: "#FFFFFF",
-          line: "#D6E4F7", // light-blue hairlines
-          tint: "#E6F1FF", // Light Blue: subtle containers and highlights
+          DEFAULT: v("paper"), // page background
+          card: v("paper-card"),
+          line: v("paper-line"), // light-blue hairlines
+          tint: v("paper-tint"), // Light Blue: subtle containers and highlights
         },
         verdict: {
           // Fill/border colors; use the *ink variants for small text (AA contrast).
           fake: "#EF4444", // alert red: untrusted / misinformation
-          fakeink: "#B91C1C",
-          fakebg: "#FEF0F0",
+          fakeink: v("fakeink"),
+          fakebg: v("fakebg"),
           manip: "#D97706", // amber: manipulative
-          manipink: "#92400E",
-          manipbg: "#FEF4E0",
+          manipink: v("manipink"),
+          manipbg: v("manipbg"),
           true: "#10B981", // emerald/teal: verified
-          trueink: "#047857",
-          truebg: "#E6F8F1",
-          pending: "#475569",
-          pendingbg: "#E6F1FF",
+          trueink: v("trueink"),
+          truebg: v("truebg"),
+          pending: v("pending"),
+          pendingbg: v("pendingbg"),
         },
         brand: {
-          DEFAULT: "#2563EB", // Royal Blue: links, hover, interaction
+          DEFAULT: v("brand"), // Royal Blue: links, hover, interaction
           navy: "#0B2D5B",
         },
         accent: "#10B981", // Teal Green: success, progress, badges

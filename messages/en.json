@@ -303,5 +303,8 @@
   "social": {
     "facebook": "TrustLab on Facebook",
     "instagram": "TrustLab on Instagram"
+  },
+  "theme": {
+    "toggle": "Switch between light and dark theme"
   }
 }

@@ -5,6 +5,7 @@ import { Navbar } from "@/components/navbar";
 import { Logo } from "@/components/logo";
 import { FacebookLink } from "@/components/facebook-link";
 import { InstagramLink } from "@/components/instagram-link";
+import { THEME_INIT_SCRIPT } from "@/lib/theme";
 
 export const metadata: Metadata = {
   title: "TrustLab — Fact-checking regional disinformation",
@@ -20,7 +21,12 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", images: ["/og.png"] },
 };
 
-export const viewport: Viewport = { themeColor: "#0B2D5B" };
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#0B2D5B" },
+    { media: "(prefers-color-scheme: dark)", color: "#0B1220" },
+  ],
+};
 
 export default function RootLayout({
   children,
@@ -28,8 +34,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ka">
+    <html lang="ka" suppressHydrationWarning>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
         {/* Multi-script fonts: Noto covers Georgian + Armenian + Latin consistently */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

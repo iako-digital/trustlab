@@ -40,7 +40,7 @@ type Phase = "intro" | "levelIntro" | "question" | "levelDone" | "result";
 
 const BADGE_STYLE: Record<BadgeTier, { gradient: string; icon: typeof ShieldCheck }> = {
   master: { gradient: "from-[#E4B429] to-[#B7791F]", icon: ShieldCheck },
-  analyst: { gradient: "from-brand to-ink", icon: Award },
+  analyst: { gradient: "from-brand to-brand-navy", icon: Award },
   investigator: { gradient: "from-ink-faint to-ink-soft", icon: Search },
   apprentice: { gradient: "from-[#C47A50] to-[#8B4F31]", icon: Medal },
 };
@@ -119,7 +119,7 @@ export function QuizApp() {
   if (phase === "intro") {
     return (
       <Card className="mx-auto max-w-xl p-6 text-center sm:p-8">
-        <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-brand to-ink text-paper shadow-card glow-soft">
+        <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-brand to-brand-navy text-white shadow-card glow-soft">
           <ShieldQuestion className="h-7 w-7" strokeWidth={2} />
         </span>
         <h2 className="mt-5 font-serif text-2xl font-semibold text-ink">{t("quiz.title")}</h2>
