@@ -268,7 +268,7 @@
     "step3Desc": "Receive a clear reply: true, false, manipulative, or pending review.",
     "whatsappCta": "Chat on WhatsApp",
     "telegramCta": "Chat on Telegram",
-    "handle": "@trustlab_bot",
+    "handle": "@cdc_support_alert_bot",
     "modalTitle": "Chat with TrustLabBot",
     "modalBody": "The bot is currently in private beta. Leave your email on the Submit page or follow our channels to get notified at launch.",
     "modalClose": "Close"
